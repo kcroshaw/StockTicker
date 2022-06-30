@@ -12,9 +12,16 @@ namespace StockTicker.Pages
             _logger = logger;
         }
 
-        public void OnGet()
-        {
+        //public void OnGet()
 
+        public IActionResult OnGet()
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Index", "Shared");
+            }
+            else
+                return RedirectToPage("/Account/Login", new { area = "Identity" });
         }
     }
 }
