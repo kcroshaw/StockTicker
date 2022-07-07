@@ -13,15 +13,15 @@ namespace StockTicker.Pages
         }
 
         //public void OnGet()
-
+        
         public IActionResult OnGet()
         {
             if (User.Identity.IsAuthenticated)
             {
-                return RedirectToAction("Index", "Shared");
+                return Page();//probably  not right
             }
             else
-                return RedirectToPage("/Account/Login", new { area = "Identity" });
+                return RedirectToPage("/Account/Login", new { area = "Identity" }); 
         }
     }
 }
