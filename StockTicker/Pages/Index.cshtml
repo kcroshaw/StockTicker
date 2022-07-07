@@ -4,11 +4,13 @@
     ViewData["Title"] = "Home page";
 }
 
-<div class="text-center">
+<!--Show this at page start then after information is submitted save the data and hide this div-->
+<div id="startInfo" class="text-center">
     <h1 class="display-4">Stock Ticker Game</h1>
     <span>Please Enter a Stock Symbol: </span><input type="text" name="stockName"/>
     <br />
     <span>Enter Amount of initial investment: $</span><input type="text" name="investmentAmt" value="0.00" />
     <button>Submit</button>
-    
 </div>
+
+
