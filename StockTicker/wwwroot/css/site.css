@@ -26,3 +26,22 @@ body {
     transform: translate(-50%, -50%);
     text-align: center
 }
+
+table.account-info {
+    margin-left: auto;
+    margin-right: auto;
+    width: 20%;
+    border: 1px solid black;
+}
+
+th.account-info, td.account-info {
+    border: 1px solid black;
+}
+
+th.account-info {
+    text-align: center;
+}
+
+td.account-info {
+    text-align: left;
+}

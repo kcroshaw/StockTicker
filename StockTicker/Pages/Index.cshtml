@@ -1,16 +1,83 @@
-﻿@page
+﻿@page  
+@using StockTicker.Models
 @model IndexModel
 @{
     ViewData["Title"] = "Home page";
 }
+@Html.AntiForgeryToken()
+
+<h1 class="display-4 text-center">Stock Ticker Game</h1>
 
 <!--Show this at page start then after information is submitted save the data and hide this div-->
-<div id="startInfo" class="text-center">
-    <h1 class="display-4">Stock Ticker Game</h1>
-    <span>Please Enter a Stock Symbol: </span><input type="text" name="stockName"/>
-    <br />
-    <span>Enter Amount of initial investment: $</span><input type="text" name="investmentAmt" value="0.00" />
-    <button>Submit</button>
+<div id="startArea" class="text-center">
+    <form method="post">
+        <span>Please Enter a Stock Symbol To Begin Game:</span><input type="text" name="stockSymbol"/><br />
+        <input asp-page-handler="GameStart" type="submit" id="startButton" value="Start"/>
+    </form>
+</div>
+
+<!--after above info is submitted and saved to DB unhide this div-->
+<div id="gameArea" class="text-center" style="display:none">
+
+    <!--Show graph here-->
+    <div id="graph">GRAPH</div>
+
+    <!--users bank account-->
+    <div class="text-center">  
+    <table class="account-info">
+        <tr>
+            <th class="account-info">Bank Account: $</th>
+            <td class="account-info">100</td>
+        </tr>
+        <tr>
+            <th class="account-info">Owned Stock</th>
+            <td class="account-info">10</td>
+        </tr>
+    </table>
+    <br/>
+    <form method="post">
+        <!--buttons for buy or sell-->
+        <span>Would you like to Buy, Sell, Hold, or Quit?</span><br/>
+        <input asp-page-handler="Buy" type="submit" id="buyButton" value="Buy"/>
+        <input asp-page-handler="Sell" type="submit" id="sellButton" value="Sell"/>
+        <input asp-page-handler="Hold" type="submit" id="holdButton" value="Hold"/><br/><br/>
+        <!--quit button-->
+        <input asp-page-handler="Quit" type="submit" name="quitButton" value="Quit"/>
+    </form>
+    </div>
 </div>
 
 
+
+@section Scripts
+{
+  
+    <script type="text/javascript">
+
+       /* Are we supposed to use ajax? if so do we have to change all of our post methods from async? -AG
+        $("#startButton").click(function() {
+            $.ajax({
+                type: "POST",
+                url: "/Index?handler=GameStart",
+                data: {},
+                contentType:'application/x-www-formurlencoded',
+                dataType: "json",
+                headers:
+                {
+                    "RequestVerificationToken": $('input:hidden[name="__RequestVerificationToken"]').val()
+                },
+                success: function(){
+                    document.getElementById("gameArea").hidden = false;
+                    document.getElementById("startArea").hidden = true;
+                    
+                }
+            })
+        })
+        */
+
+
+
+
+
+    </script>
+}

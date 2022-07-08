@@ -12,8 +12,9 @@ namespace StockTicker.Models
         [Precision(18, 2)]
         public decimal Money { get; set; }
 
-        public DateTime LastDate { get; set; }
+        public int StockAmount { get; set; }
 
+        public DateTime Date { get; set; }
 
     }
 }
