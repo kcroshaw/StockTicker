@@ -85,8 +85,8 @@ namespace StockTicker.Pages
 
         public async Task<IActionResult> OnPostGameStart()
         {
-            startArea.style.display = 'none'; //dont know how to directly access html elements from here, everything i saw online said to do this but it doesnt work..... -AG
-            gameArea.style.display = 'block';
+            startArea.style.display = "none"; //dont know how to directly access html elements from here, everything i saw online said to do this but it doesnt work..... -AG
+            gameArea.style.display = "block";
             
             InitGame();
 
