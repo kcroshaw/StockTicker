@@ -8,7 +8,6 @@ using System;
 using ChartDirector;
 using System.Net;
 using Newtonsoft.Json;
-using StockTicker.Services;
 
 namespace StockTicker.Pages
 {
@@ -24,23 +23,28 @@ namespace StockTicker.Pages
         private int weekcounter = 0;
         private DateTime tempDate;
 
-        public ApiClass apiCall;
-
         public List<string> listOfStrings = new List<string>();
-
-        public string test;
-
-        public string tick = "GME";
 
         public IActionResult OnGet()
         {
             if (User.Identity.IsAuthenticated)
             {
                 //Call api and assign response to Stock Object with selected ticker and date
-                apiCall = new ApiClass("tick");
-                test = apiCall.stock_.Symbol.ToString();
+                var ticker = "AAPL";
+                var dateTest = RandomDay();
+                var date = dateTest.ToString("yyyy-MM-dd");
+                var apiRequest = $"https://api.polygon.io/v1/open-close/{ticker}/{date}?adjusted=true&apiKey=6TH_lUVoIIueeLAJwbCSPncDIEsGQG0d";
+                WebRequest request = WebRequest.Create(apiRequest);
+                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+                Stream dataStream = response.GetResponseStream();
+                StreamReader reader = new StreamReader(dataStream);
+                string responseFromServer = reader.ReadToEnd();
+                Stock DeserializedObject = JsonConvert.DeserializeObject<Stock>(responseFromServer);
 
-
+                // Cleanup the streams and the response.
+                reader.Close();
+                dataStream.Close();
+                response.Close();
                 return Page();
             }
             else
@@ -52,10 +56,10 @@ namespace StockTicker.Pages
 
         public IActionResult OnPostGetAjax(string name)
         {
-            tick = String.Format("{0}", Request.Form["pick"]);
-
-            return Page();//new JsonResult("Hello " + name);
+            return new JsonResult("Hello " + name);
         }
+       
+        
         //this function should be used to update the data shown on the charts 
         public void ProgressGameplay(DateTime date, string stockSymbol)
         {
@@ -88,10 +92,14 @@ namespace StockTicker.Pages
         public DateTime RandomDay()
         {
             Random gen = new Random();
-            DateTime start = DateTime.Today.AddYears(-10);
+            DateTime start = DateTime.Today.AddYears(-2);
             int range = (DateTime.Today.AddMonths(-6) - start).Days;
-            
-            return start.AddDays(gen.Next(range));
+            DateTime randDay = start.AddDays(gen.Next(range));
+            if (randDay.DayOfWeek == DayOfWeek.Saturday || randDay.DayOfWeek == DayOfWeek.Sunday)
+            {
+                randDay = randDay.AddDays(2);
+            }
+                return randDay;
         }
         
         public async void InitGame()
@@ -99,8 +107,6 @@ namespace StockTicker.Pages
             //put $10,000 dollars into users DB entry
 
             //save stock symbol to users DB entry
-
-
             var stockSymb = Request.Form["stockSymbol"];
 
             //find random a day to start on between 6 months and 10 years ago
@@ -110,16 +116,15 @@ namespace StockTicker.Pages
 
         public async Task<IActionResult> OnPostGameStart()
         {
-            //startArea.style.display = 'none'; //dont know how to directly access html elements from here, everything i saw online said to do this but it doesnt work..... -AG
-            //gameArea.style.display = 'block';
-
+   
+            
             await Task.Run(() => InitGame());
-            return RedirectToPage("./Index");
+            
 
             //call function that handles gameplay stuff
             //ProgressGameplay(/*pass datetime from the users DB entry*/,/*pass stock symbol from users DB entry*/);
-
-
+            
+            return RedirectToPage("./Index"); 
         }
 
         //public async Task<IActionResult> OnPostBuy()
