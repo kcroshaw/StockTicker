@@ -100,6 +100,8 @@ namespace StockTicker.Pages
             //put $10,000 dollars into users DB entry
 
             //save stock symbol to users DB entry
+
+
             var stockSymb = Request.Form["stockSymbol"];
 
             //find random a day to start on between 6 months and 10 years ago
