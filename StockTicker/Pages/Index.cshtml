@@ -12,7 +12,8 @@
 <div id="startArea" class="text-center">
     <form method="post">
         <span>Please Enter a Stock Symbol To Begin Game:</span><input type="text" name="stockSymbol"/><br />
-        <input asp-page-handler="GameStart" type="submit" id="startButton" value="Start"/>
+        <input type="text" id="testText" />
+        <input asp-page-handler="GameStart" type="submit" id="invokeAjaxHello" value="Start"/>
     </form>
 </div>
 
@@ -47,37 +48,41 @@
     </div>
 </div>
 
-
-
 @section Scripts
 {
-  
-    <script type="text/javascript">
 
-       /* Are we supposed to use ajax? if so do we have to change all of our post methods from async? -AG
-        $("#startButton").click(function() {
+    <script type="text/javascript">
+        $("#invokeAjaxHello").click(function() {
             $.ajax({
                 type: "POST",
-                url: "/Index?handler=GameStart",
-                data: {},
-                contentType:'application/x-www-formurlencoded',
+                url: "/Index?handler=GetAjax",
+                data:{"name": $('#testText').val()},
+                contentType: 'application/x-www-form-urlencoded',
                 dataType: "json",
                 headers:
                 {
                     "RequestVerificationToken": $('input:hidden[name="__RequestVerificationToken"]').val()
                 },
-                success: function(){
-                    document.getElementById("gameArea").hidden = false;
-                    document.getElementById("startArea").hidden = true;
-                    
+                success: drawChart();
+            });
+
+        });
+        $("#doubleYourMoney").click(function() {
+            $.ajax({
+                type: "POST",
+                url: "/Index?handler=DoubleMoney",
+                data: {"description": "please", "value": 2},
+                contentType: 'application/x-www-form-urlencoded',
+                dataType: "json",
+                headers:
+                {
+                    "RequestVerificationToken": $('input:hidden[name="__RequestVerificationToken"]').val()
+                },
+                success: function( message ) {
+                    document.getElementById("result").innerHTML = message;
                 }
-            })
-        })
-        */
+            });
 
-
-
-
-
+        });        
     </script>
 }
