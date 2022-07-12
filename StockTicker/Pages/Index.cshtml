@@ -32,7 +32,7 @@
 </div>
 
 <!--after above info is submitted and saved to DB unhide this div-->
-<div id="gameArea" class="text-center" style="display:none" runat="server">
+<div id="gameArea" class="text-center" style="visibility:hidden" runat="server">
 
     <!--Show graph here-->
     <div id="graph">GRAPH</div>
@@ -51,12 +51,12 @@
     </table>
     <br/>
     
-    <form method="post">
+    <form id="menu" method="post">
         <!--buttons for buy or sell-->
         <span>Would you like to Buy, Sell, Hold, or Quit?</span><br/>
-        <input asp-page-handler="Buy" type="radio" id="bshButton" value="Buy"/>
-        <input asp-page-handler="Sell" type="radio" id="bshButton" value="Sell"/>
-        <input asp-page-handler="Hold" type="radio" id="bshButton" value="Hold"/><br/><br/>
+        <input asp-page-handler="Buy" type="radio" id="buyButton" name="bshbtn" value="Buy">Buy</>
+        <input asp-page-handler="Sell" type="radio" id="sellButton" name="bshbtn" value="Sell" />Sell</>
+        <input asp-page-handler="Hold" type="radio" id="holdButton" name="bshbtn" value="Hold" />Hold</><br/>
         <!--quit button-->
         <input asp-page-handler="Continue" type="submit" name="NextButton" value="Next"/>
         <input asp-page-handler="Quit" type="submit" name="quitButton" value="Quit"/>
@@ -75,6 +75,8 @@
         function toggleDiv(id) {
             var div = document.getElementById(id);
             div.style.display = "none";
+            var div = document.getElementById('menu');
+            div.style.visibility = "visible"
         }
 
         //$("#startButton").click(function() {
