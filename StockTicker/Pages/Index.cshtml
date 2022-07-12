@@ -11,7 +11,17 @@
 <!--Show this at page start then after information is submitted save the data and hide this div-->
 <div id="startArea" class="text-center">
     <form method="post">
-        <span>Please Enter a Stock Symbol To Begin Game:</span><input type="text" name="stockSymbol"/><br />
+        <span>Please Enter a Stock Symbol To Begin Game:</span>
+
+        <select type="" name="stockSymbol">
+               <option value="AAPL">AAPL - (apple)</option>
+               <option value="MSFT">MSFT - (microsoft)</option>
+               <option value="AMZN">AMZN - (amazon)</option>
+               <option value="TSLA">TSLA - (tesla)</option>
+               <option value="GME">GME - (gamestop)</option>
+        </select>
+        
+        <br />
         <input type="text" id="testText" />
         <input asp-page-handler="GameStart" type="submit" id="invokeAjaxHello" value="Start"/>
     </form>
