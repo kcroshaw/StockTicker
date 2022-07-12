@@ -8,6 +8,7 @@ using System;
 using ChartDirector;
 using System.Net;
 using Newtonsoft.Json;
+using StockTicker.Services;
 
 namespace StockTicker.Pages
 {
@@ -23,27 +24,23 @@ namespace StockTicker.Pages
         private int weekcounter = 0;
         private DateTime tempDate;
 
+        public ApiClass apiCall;
+
         public List<string> listOfStrings = new List<string>();
+
+        public string test;
+
+        public string tick = "GME";
 
         public IActionResult OnGet()
         {
             if (User.Identity.IsAuthenticated)
             {
                 //Call api and assign response to Stock Object with selected ticker and date
-                var ticker = "AAPL";
-                var date = "2020-10-14";
-                var apiRequest = $"https://api.polygon.io/v1/open-close/{ticker}/{date}?adjusted=true&apiKey=6TH_lUVoIIueeLAJwbCSPncDIEsGQG0d";
-                WebRequest request = WebRequest.Create(apiRequest);
-                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-                Stream dataStream = response.GetResponseStream();
-                StreamReader reader = new StreamReader(dataStream);
-                string responseFromServer = reader.ReadToEnd();
-                Stock DeserializedObject = JsonConvert.DeserializeObject<Stock>(responseFromServer);
+                apiCall = new ApiClass("tick");
+                test = apiCall.stock_.Symbol.ToString();
 
-                // Cleanup the streams and the response.
-                reader.Close();
-                dataStream.Close();
-                response.Close();
+
                 return Page();
             }
             else
@@ -55,7 +52,9 @@ namespace StockTicker.Pages
 
         public IActionResult OnPostGetAjax(string name)
         {
-            return new JsonResult("Hello " + name);
+            tick = String.Format("{0}", Request.Form["pick"]);
+
+            return Page();//new JsonResult("Hello " + name);
         }
         //this function should be used to update the data shown on the charts 
         public void ProgressGameplay(DateTime date, string stockSymbol)
