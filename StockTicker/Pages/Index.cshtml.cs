@@ -89,10 +89,15 @@ namespace StockTicker.Pages
         public DateTime RandomDay()
         {
             Random gen = new Random();
-            DateTime start = DateTime.Today.AddYears(-10);
+            DateTime start = DateTime.Today.AddYears(-2);
             int range = (DateTime.Today.AddMonths(-6) - start).Days;
-            
-            return start.AddDays(gen.Next(range));
+            var randDay = start.AddDays(gen.Next(range));
+            if (randDay.DayOfWeek == DayOfWeek.Saturday || randDay.DayOfWeek == DayOfWeek.Saturday)
+            {
+                randDay = randDay.AddDays(2);
+            }
+
+                return randDay;
         }
         
         public async void InitGame()
