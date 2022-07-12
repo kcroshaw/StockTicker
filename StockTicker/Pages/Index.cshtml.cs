@@ -86,17 +86,16 @@ namespace StockTicker.Pages
         }
 
 
-        public DateTime RandomDay()
+        public DateTime RandomDay() //still grabbing weekends FIXME
         {
             Random gen = new Random();
             DateTime start = DateTime.Today.AddYears(-2);
             int range = (DateTime.Today.AddMonths(-6) - start).Days;
-            var randDay = start.AddDays(gen.Next(range));
+            DateTime randDay = start.AddDays(gen.Next(range));
             if (randDay.DayOfWeek == DayOfWeek.Saturday || randDay.DayOfWeek == DayOfWeek.Saturday)
             {
                 randDay = randDay.AddDays(2);
             }
-
                 return randDay;
         }
         
@@ -120,11 +119,11 @@ namespace StockTicker.Pages
             //gameArea.style.display = 'block';
 
             await Task.Run(() => InitGame());
-            return RedirectToPage("./Index");
+            
 
             //call function that handles gameplay stuff
             //ProgressGameplay(/*pass datetime from the users DB entry*/,/*pass stock symbol from users DB entry*/);
-
+            return RedirectToPage("./Index");
 
         }
 

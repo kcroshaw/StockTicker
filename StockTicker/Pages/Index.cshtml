@@ -9,7 +9,7 @@
 <h1 class="display-4 text-center">Stock Ticker Game</h1>
 
 <!--Show this at page start then after information is submitted save the data and hide this div-->
-<div id="startArea" class="text-center">
+<div id="startArea" class="text-center" runat="server">
     <form method="post">
         <span>Please Enter a Stock Symbol To Begin Game:</span>
 
@@ -22,7 +22,6 @@
         </select>
         
         <br />
-        <input type="text" id="testText" />
         <input asp-page-handler="GameStart" type="submit" id="invokeAjaxHello" value="Start"/>
     </form>
 </div>
@@ -62,6 +61,9 @@
 {
 
     <script type="text/javascript">
+
+
+
         $("#invokeAjaxHello").click(function() {
             $.ajax({
                 type: "POST",
