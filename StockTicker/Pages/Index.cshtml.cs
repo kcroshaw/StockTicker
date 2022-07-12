@@ -94,7 +94,7 @@ namespace StockTicker.Pages
             DateTime start = DateTime.Today.AddYears(-2);
             int range = (DateTime.Today.AddMonths(-6) - start).Days;
             DateTime randDay = start.AddDays(gen.Next(range));
-            if (randDay.DayOfWeek == DayOfWeek.Saturday || randDay.DayOfWeek == DayOfWeek.Saturday)
+            if (randDay.DayOfWeek == DayOfWeek.Saturday || randDay.DayOfWeek == DayOfWeek.Sunday)
             {
                 randDay = randDay.AddDays(2);
             }
