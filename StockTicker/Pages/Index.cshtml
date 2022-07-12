@@ -3,7 +3,12 @@
 @model IndexModel
 @{
     ViewData["Title"] = "Home page";
+
+    
+
 }
+<!DOCTYPE html>
+<html>
 @Html.AntiForgeryToken()
 
 <h1 class="display-4 text-center">Stock Ticker Game</h1>
@@ -22,16 +27,16 @@
         </select>
         
         <br />
-        <input asp-page-handler="GameStart" type="submit" id="invokeAjaxHello" value="Start"/>
+        <input asp-page-handler="GameStart" type="submit" id="startButton" value="Start" onclick="toggleDiv('startArea')"/>
     </form>
 </div>
 
 <!--after above info is submitted and saved to DB unhide this div-->
-<div id="gameArea" class="text-center" style="display:none">
+<div id="gameArea" class="text-center" style="display:none" runat="server">
 
     <!--Show graph here-->
     <div id="graph">GRAPH</div>
-
+ 
     <!--users bank account-->
     <div class="text-center">  
     <table class="account-info">
@@ -45,6 +50,7 @@
         </tr>
     </table>
     <br/>
+    
     <form method="post">
         <!--buttons for buy or sell-->
         <span>Would you like to Buy, Sell, Hold, or Quit?</span><br/>
@@ -56,45 +62,58 @@
     </form>
     </div>
 </div>
+</html>
 
 @section Scripts
 {
-
+ 
+    
     <script type="text/javascript">
 
+        //this isnt working because the page keeps reloading on click
+        function toggleDiv(id) {
+            var div = document.getElementById(id);
+            div.style.display = "none";
+        }
 
+        //$("#startButton").click(function() {
+        //    $.ajax({
+        //        type: "POST",
+        //        url: "/Index?handler=GetAjax",
+        //        data:{"name": "success"},
+        //        contentType: 'application/x-www-form-urlencoded',
+        //        dataType: "json",
+        //        headers:
+        //        {
+        //            "RequestVerificationToken": $('input:hidden[name="__RequestVerificationToken"]').val()
+        //        },
+        //        success: function(message) {
+        //            var startDiv = document.getElementById("startArea");
+        //            var gameDiv = document.getElementById("gameArea");
 
-        $("#invokeAjaxHello").click(function() {
-            $.ajax({
-                type: "POST",
-                url: "/Index?handler=GetAjax",
-                data:{"name": $('#testText').val()},
-                contentType: 'application/x-www-form-urlencoded',
-                dataType: "json",
-                headers:
-                {
-                    "RequestVerificationToken": $('input:hidden[name="__RequestVerificationToken"]').val()
-                },
-                success: drawChart();
-            });
+        //            startDiv.style.display = "none";
+        //            gameDiv.style.display = "block";
+        //        };
+        //    });
 
-        });
-        $("#doubleYourMoney").click(function() {
-            $.ajax({
-                type: "POST",
-                url: "/Index?handler=DoubleMoney",
-                data: {"description": "please", "value": 2},
-                contentType: 'application/x-www-form-urlencoded',
-                dataType: "json",
-                headers:
-                {
-                    "RequestVerificationToken": $('input:hidden[name="__RequestVerificationToken"]').val()
-                },
-                success: function( message ) {
-                    document.getElementById("result").innerHTML = message;
-                }
-            });
+        //});
+        
+        //$("#doubleYourMoney").click(function() {
+        //    $.ajax({
+        //        type: "POST",
+        //        url: "/Index?handler=DoubleMoney",
+        //        data: {"description": "please", "value": 2},
+        //        contentType: 'application/x-www-form-urlencoded',
+        //        dataType: "json",
+        //        headers:
+        //        {
+        //            "RequestVerificationToken": $('input:hidden[name="__RequestVerificationToken"]').val()
+        //        },
+        //        success: function( message ) {
+        //            document.getElementById("result").innerHTML = message;
+        //        }
+        //    });
 
-        });        
+        //});        
     </script>
 }

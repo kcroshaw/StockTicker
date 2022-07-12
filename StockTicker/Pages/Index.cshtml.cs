@@ -32,7 +32,6 @@ namespace StockTicker.Pages
                 //Call api and assign response to Stock Object with selected ticker and date
                 var ticker = "AAPL";
                 var dateTest = RandomDay();
-                
                 var date = dateTest.ToString("yyyy-MM-dd");
                 var apiRequest = $"https://api.polygon.io/v1/open-close/{ticker}/{date}?adjusted=true&apiKey=6TH_lUVoIIueeLAJwbCSPncDIEsGQG0d";
                 WebRequest request = WebRequest.Create(apiRequest);
@@ -59,6 +58,8 @@ namespace StockTicker.Pages
         {
             return new JsonResult("Hello " + name);
         }
+       
+        
         //this function should be used to update the data shown on the charts 
         public void ProgressGameplay(DateTime date, string stockSymbol)
         {
@@ -88,7 +89,7 @@ namespace StockTicker.Pages
         }
 
 
-        public DateTime RandomDay() //still grabbing weekends FIXME
+        public DateTime RandomDay()
         {
             Random gen = new Random();
             DateTime start = DateTime.Today.AddYears(-2);
@@ -106,8 +107,6 @@ namespace StockTicker.Pages
             //put $10,000 dollars into users DB entry
 
             //save stock symbol to users DB entry
-
-
             var stockSymb = Request.Form["stockSymbol"];
 
             //find random a day to start on between 6 months and 10 years ago
@@ -117,16 +116,15 @@ namespace StockTicker.Pages
 
         public async Task<IActionResult> OnPostGameStart()
         {
-            //startArea.style.display = 'none'; //dont know how to directly access html elements from here, everything i saw online said to do this but it doesnt work..... -AG
-            //gameArea.style.display = 'block';
-
+   
+            
             await Task.Run(() => InitGame());
             
 
             //call function that handles gameplay stuff
             //ProgressGameplay(/*pass datetime from the users DB entry*/,/*pass stock symbol from users DB entry*/);
-            return RedirectToPage("./Index");
-
+            
+            return RedirectToPage("./Index"); 
         }
 
         //public async Task<IActionResult> OnPostBuy()
