@@ -31,7 +31,9 @@ namespace StockTicker.Pages
             {
                 //Call api and assign response to Stock Object with selected ticker and date
                 var ticker = "AAPL";
-                var date = "2020-10-14";
+                var dateTest = RandomDay();
+                
+                var date = dateTest.ToString("yyyy-MM-dd");
                 var apiRequest = $"https://api.polygon.io/v1/open-close/{ticker}/{date}?adjusted=true&apiKey=6TH_lUVoIIueeLAJwbCSPncDIEsGQG0d";
                 WebRequest request = WebRequest.Create(apiRequest);
                 HttpWebResponse response = (HttpWebResponse)request.GetResponse();
