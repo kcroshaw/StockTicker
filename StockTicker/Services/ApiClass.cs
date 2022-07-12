@@ -22,12 +22,12 @@ namespace StockTicker.Services
 
         public Stock stock_;
 
-        public ApiClass(string tick)
+        public ApiClass(string tick,  string dat)
         {
 
             //Call api and assign response to Stock Object with selected ticker and date
             var ticker = tick;
-            var date = "2020-10-14";
+            var date = dat;
             var apiRequest = $"https://api.polygon.io/v1/open-close/{ticker}/{date}?adjusted=true&apiKey=6TH_lUVoIIueeLAJwbCSPncDIEsGQG0d";
             WebRequest request = WebRequest.Create(apiRequest);
             HttpWebResponse response = (HttpWebResponse)request.GetResponse();

@@ -8,6 +8,7 @@ using System;
 using ChartDirector;
 using System.Net;
 using Newtonsoft.Json;
+using StockTicker.Services;
 
 namespace StockTicker.Pages
 {
@@ -23,7 +24,13 @@ namespace StockTicker.Pages
         private int weekcounter = 0;
         private DateTime tempDate;
 
+        public ApiClass apiCall;
+
+        private DateTime startDate;
+
         public List<string> listOfStrings = new List<string>();
+
+        public string test;
 
         public IActionResult OnGet()
         {
@@ -31,20 +38,10 @@ namespace StockTicker.Pages
             {
                 //Call api and assign response to Stock Object with selected ticker and date
                 var ticker = "AAPL";
-                var dateTest = RandomDay();
-                var date = dateTest.ToString("yyyy-MM-dd");
-                var apiRequest = $"https://api.polygon.io/v1/open-close/{ticker}/{date}?adjusted=true&apiKey=6TH_lUVoIIueeLAJwbCSPncDIEsGQG0d";
-                WebRequest request = WebRequest.Create(apiRequest);
-                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-                Stream dataStream = response.GetResponseStream();
-                StreamReader reader = new StreamReader(dataStream);
-                string responseFromServer = reader.ReadToEnd();
-                Stock DeserializedObject = JsonConvert.DeserializeObject<Stock>(responseFromServer);
-
-                // Cleanup the streams and the response.
-                reader.Close();
-                dataStream.Close();
-                response.Close();
+                startDate = RandomDay();
+                var dateTest = startDate.ToString("yyyy-MM-dd");
+                apiCall = new ApiClass(ticker,dateTest);
+                test = apiCall.stock_.Symbol.ToString();
                 return Page();
             }
             else
