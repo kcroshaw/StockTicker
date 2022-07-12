@@ -27,7 +27,7 @@
         </select>
         
         <br />
-        <input asp-page-handler="GameStart" type="submit" id="startButton" value="Start" onclick="toggleDiv('startArea')"/>
+        <input asp-page-handler="GameStart" type="button" id="startButton" value="Start" onclick="toggleDiv('startArea')"/>
     </form>
 </div>
 
@@ -54,10 +54,11 @@
     <form method="post">
         <!--buttons for buy or sell-->
         <span>Would you like to Buy, Sell, Hold, or Quit?</span><br/>
-        <input asp-page-handler="Buy" type="submit" id="buyButton" value="Buy"/>
-        <input asp-page-handler="Sell" type="submit" id="sellButton" value="Sell"/>
-        <input asp-page-handler="Hold" type="submit" id="holdButton" value="Hold"/><br/><br/>
+        <input asp-page-handler="Buy" type="radio" id="bshButton" value="Buy"/>
+        <input asp-page-handler="Sell" type="radio" id="bshButton" value="Sell"/>
+        <input asp-page-handler="Hold" type="radio" id="bshButton" value="Hold"/><br/><br/>
         <!--quit button-->
+        <input asp-page-handler="Continue" type="submit" name="NextButton" value="Next"/>
         <input asp-page-handler="Quit" type="submit" name="quitButton" value="Quit"/>
     </form>
     </div>
