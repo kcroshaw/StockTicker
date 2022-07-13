@@ -16,7 +16,7 @@
     <form method="post">
         <span>Please Enter a Stock Symbol To Begin Game:</span>
 
-        <select id="stockSymbol" name="stockSymbol" required>
+        <select id="stockSymbol" name="stockSymbol">
                <option value="AAPL">AAPL - (apple)</option>
                <option value="MSFT">MSFT - (microsoft)</option>
                <option value="AMZN">AMZN - (amazon)</option>
@@ -82,14 +82,14 @@
     </script>
     
     <!--Ajax Scripts-->
-    <script src="http://ajax.microsoft.com/ajax/jquery/jquery-1.10.2.js" type="text/javascript">
-
-       
+    <script type="text/javascript">
+    
         $("#startButton").click(function() {
+            var symbol = document.getElementById("stockSymbol").options[document.getElementById("stockSymbol")].value;
             $.ajax({
                 type: "POST",
                 url: "/Index?handler=AjaxGameStart",
-                data:{"name": "World"},
+                data: {"data" : symbol} ,
                 contentType: 'application/x-www-form-urlencoded',
                 dataType: "json",
                 headers:
@@ -102,5 +102,6 @@
                 };
             });
         });
+
     </script>
 }
