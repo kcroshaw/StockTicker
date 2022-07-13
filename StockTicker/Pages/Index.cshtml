@@ -33,11 +33,18 @@
 
 
 <!--after above info is submitted and saved to DB unhide this div-->
-<div id="gameArea" class="text-center" style="visibility:hidden" runat="server">
+    <div id="gameArea" class="text-center" style="visibility:hidden" runat="server">
 
     <!--Show graph here-->
     <div id="graph">GRAPH</div><br/>
- 
+    <center>
+        <div id="tester" style="width:600px;height:250px;"></div>
+        <div class="slidecontainer">
+            <input type="range" min="1" max="@Model.Balance" value="50" class="slider" id="myRange">
+            <p>Amount: <span id="demo"></span></p>
+        </div>
+    </center>
+
     <!--users bank account-->
     <div class="text-center">  
     <table class="account-info">
@@ -70,6 +77,22 @@
 
 @section Scripts
 {
+
+    <script src="https://cdn.plot.ly/plotly-2.12.1.min.js"></script>
+    <script src="plotly-2.12.1.min.js"></script>
+
+    <script>
+        var data = [
+            {
+                x: ['Bank Account', 'Stocks'],
+                y: [@Model.Balance, @Model.StockOwned],
+                type: 'bar'
+            }
+        ];
+
+        Plotly.newPlot('tester', data);
+    </script>
+
     <script type="text/javascript">
         function showBuySellInput() {
             var hold = document.getElementById("holdButton");
@@ -117,6 +140,14 @@
                 }
             });
         });
+
+        var slider = document.getElementById("myRange");
+        var output = document.getElementById("demo");
+        output.innerHTML = slider.value;
+
+        slider.oninput = function () {
+            output.innerHTML = this.value;
+        }
 
     </script>
 }
