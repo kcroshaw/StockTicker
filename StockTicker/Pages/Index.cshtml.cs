@@ -32,16 +32,16 @@ namespace StockTicker.Pages
 
         public string test;
 
+        public double OpenPrice;
+
+        public double Balance = 10000.00;
+
+        public int StockOwned = 0;
+
         public IActionResult OnGet()
         {
             if (User.Identity.IsAuthenticated)
             {
-                //Call api and assign response to Stock Object with selected ticker and date
-                var ticker = "AAPL";
-                startDate = RandomDay();
-                var dateTest = startDate.ToString("yyyy-MM-dd");
-                apiCall = new ApiClass(ticker,dateTest);
-                test = apiCall.stock_.Symbol.ToString();
                 return Page();
             }
             else
@@ -116,8 +116,14 @@ namespace StockTicker.Pages
 
             //call function that handles gameplay stuff
             //ProgressGameplay(/*pass datetime from the users DB entry*/,/*pass stock symbol from users DB entry*/);
-
-            return new JsonResult(val);//probably change this
+            //Call api and assign response to Stock Object with selected ticker and date
+            startDate = RandomDay();
+            var dateTest = startDate.ToString("yyyy-MM-dd");
+            apiCall = new ApiClass(val, dateTest);
+            test = apiCall.stock_.Symbol.ToString();
+            OpenPrice = apiCall.stock_.Open;
+            OpenPrice = Math.Truncate(OpenPrice * 100) / 100;
+            return new JsonResult($"The price for {test} is ${OpenPrice} - ");//probably change this
         }
 
         public IActionResult OnPostAjaxBuy()

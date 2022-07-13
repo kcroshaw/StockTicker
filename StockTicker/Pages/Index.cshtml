@@ -42,25 +42,27 @@
     <div class="text-center">  
     <table class="account-info">
         <tr>
-            <th class="account-info">Bank Account: $</th>
-            <td class="account-info">100</td>
+            <th class="account-info">Bank Account:</th>
+            <td class="account-info">$@Model.Balance</td>
         </tr>
         <tr>
-            <th class="account-info">Owned Stock</th>
-            <td class="account-info">10</td>
+            <th class="account-info">Owned Stock:</th>
+            <td class="account-info">@Model.StockOwned</td>
         </tr>
     </table>
     <br/>
     
     <form id="menu" method="post">
         <!--buttons for buy or sell-->
-        <span>Would you like to Buy, Sell, Hold, or Quit?</span><br/>
-        <input asp-page-handler="Buy" type="radio" id="buyButton" name="bshbtn" value="Buy">Buy</>
-        <input asp-page-handler="Sell" type="radio" id="sellButton" name="bshbtn" value="Sell" />Sell</>
-        <input asp-page-handler="Hold" type="radio" id="holdButton" name="bshbtn" value="Hold" />Hold</><br/>
+        <div id="stockInfo"></div>
+        <span>Would you like to Buy, Sell, Hold, or Quit?</span><br />
+        <input asp-page-handler="Buy" type="radio" id="buyButton" name="bshbtn" value="Buy" onclick="showBuySellInput()">Buy</>
+        <input asp-page-handler="Sell" type="radio" id="sellButton" name="bshbtn" value="Sell" onclick="showBuySellInput()" />Sell</>
+        <input asp-page-handler="Hold" type="radio" id="holdButton" name="bshbtn" value="Hold" onclick="showBuySellInput()"/>Hold</><br />
+        <input type="text" id="buySellInput" style="visibility:hidden" /><br /><br />
         <!--quit button-->
-        <input type="button" name="acceptButton" value="Accept"/><br/><br/>
-        <input type="button" name="quitButton" value="Quit"/>
+        <input type="button" name="acceptButton" value="Accept" /><br /><br />
+        <input type="button" name="quitButton" value="Quit" />
     </form>
     </div>
 </div>
@@ -68,6 +70,17 @@
 
 @section Scripts
 {
+    <script type="text/javascript">
+        function showBuySellInput() {
+            var hold = document.getElementById("holdButton");
+            if (hold.checked) {
+                document.getElementById("buySellInput").style.visibility = 'hidden';
+            }
+            else {
+                document.getElementById("buySellInput").style.visibility = 'visible';
+            }
+        }
+    </script>
     
     <script type="text/javascript">
 
@@ -85,11 +98,13 @@
     <script type="text/javascript">
     
         $("#startButton").click(function() {
-            var symbol = document.getElementById("stockSymbol").options[document.getElementById("stockSymbol")].value;
+            //var symbol = document.getElementById("stockSymbol").options[document.getElementById("stockSymbol")].value;
+            var e = document.getElementById("stockSymbol");
+            var strUser = e.value;
             $.ajax({
                 type: "POST",
                 url: "/Index?handler=AjaxGameStart",
-                data: {"data" : symbol} ,
+                data: { "val": strUser },
                 contentType: 'application/x-www-form-urlencoded',
                 dataType: "json",
                 headers:
@@ -98,8 +113,8 @@
                 },
                 success: function(message) {
                     
-                    document.getElementById("graph").innerHTML = message;
-                };
+                    document.getElementById("stockInfo").innerHTML = message;
+                }
             });
         });
 
