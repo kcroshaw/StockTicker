@@ -51,12 +51,8 @@ namespace StockTicker.Pages
 
         }
 
-        public IActionResult OnPostGetAjax(string name)
-        {
-            return new JsonResult("Hello " + name);
-        }
-       
-        
+//***********Helper functions*************************
+
         //this function should be used to update the data shown on the charts 
         public void ProgressGameplay(DateTime date, string stockSymbol)
         {
@@ -67,15 +63,15 @@ namespace StockTicker.Pages
 
 
             //call api again using new date?
-            //or at least somehow get new data for the next date            
+                      
 
-            //update chart data
+            //update chart with new data
 
             //increase week counter variable
             weekcounter++;
 
-            //check to see if 10 weeks have passed and quit game if yes?
-            if(weekcounter > 10)
+            //check to see if 7 weeks have passed and quit game if yes?
+            if(weekcounter > 7)
             {
                 //end game
                     //sell all remaining stocks
@@ -99,7 +95,7 @@ namespace StockTicker.Pages
                 return randDay;
         }
         
-        public async void InitGame()
+        public void InitGame()
         {
             //put $10,000 dollars into users DB entry
 
@@ -111,53 +107,59 @@ namespace StockTicker.Pages
 
         }
 
-        public async Task<IActionResult> OnPostGameStart()
+//************Ajax functions**********************
+
+        public IActionResult OnPostAjaxGameStart(string val)
         {
-   
-            
-            await Task.Run(() => InitGame());
-            
+            //initialize the game
+            //InitGame();
 
             //call function that handles gameplay stuff
             //ProgressGameplay(/*pass datetime from the users DB entry*/,/*pass stock symbol from users DB entry*/);
-            
-            return RedirectToPage("./Index"); 
+
+            return new JsonResult(val);//probably change this
         }
 
-        //public async Task<IActionResult> OnPostBuy()
-        //{
-        //    //have user indicate how much stock to buy
-        //    //maybe have a seperate div with a input box and button that appears when buy is clicked and make the other buttons disappear temporarily?
+        public IActionResult OnPostAjaxBuy()
+        {
+            //have user indicate how much stock to buy
+            //maybe have a seperate div with a input box and button that appears when buy is clicked and make the other buttons disappear temporarily?
 
-        //    //progress the game state
-        //    //ProgressGameplay(/*pass datetime from the users DB entry*/,/*pass stock symbol from users DB entry*/);
+            //progress the game state
+            //ProgressGameplay(/*pass datetime from the users DB entry*/,/*pass stock symbol from users DB entry*/);
+            
+            return RedirectToPage("./Index");//probably change this
+        }
 
-        //}
+        public IActionResult OnPostAjaxSell()
+        {
+            // have user select how much stock to sell
+            //maybe have a seperate div with a input box and button that appears when sell is clicked and make the other buttons disappear temporarily?
 
-        //public async Task<IActionResult> OnPostSell()
-        //{
-        //    // have user select how much stock to sell
-        //    //maybe have a seperate div with a input box and button that appears when sell is clicked and make the other buttons disappear temporarily?
+            //add dollar amount to users account
 
-        //    //add dollar amount to users account
+            //progress the game state
+            //ProgressGameplay(/*pass datetime from the users DB entry*/,/*pass stock symbol from users DB entry*/);
 
-        //    //progress the game state
-        //    //ProgressGameplay(/*pass datetime from the users DB entry*/,/*pass stock symbol from users DB entry*/);
+            return RedirectToPage("./Index");//probably change this
+        }
+        
+        public IActionResult OnPostAjaxHold()
+        {
+            //do nothing and progress the game state
+            //ProgressGameplay(/*pass datetime from the users DB entry*/,/*pass stock symbol from users DB entry*/);
 
-        //}
+            return RedirectToPage("./Index");//probably change this
+        }
 
-        //public async Task<IActionResult> OnPostHold()
-        //{
-        //    //do nothing and progress the game state
-        //    //ProgressGameplay(/*pass datetime from the users DB entry*/,/*pass stock symbol from users DB entry*/);
-        //}
+        public IActionResult OnPostAjaxQuit()
+        {
+            //quit game completely
+            //sell all stock the user has and add the money to bank account
+            //show ending results
 
-        //public async Task<IActionResult> OnPostQuit()
-        //{
-        //    //quit game completely
-        //        //sell all stock the user has and add the money to bank account
-        //        //show ending results
-        //}
+            return RedirectToPage("./Index");//probably change this
+        }
 
     }
 }
