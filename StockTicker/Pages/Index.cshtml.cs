@@ -123,7 +123,7 @@ namespace StockTicker.Pages
             test = apiCall.stock_.Symbol.ToString();
             OpenPrice = apiCall.stock_.Open;
             OpenPrice = Math.Truncate(OpenPrice * 100) / 100;
-            return new JsonResult($"The price for {test} is ${OpenPrice} - ");//probably change this
+            return new JsonResult($"The price for {test} is ${OpenPrice}");//probably change this
         }
 
         public IActionResult OnPostAjaxBuy()
