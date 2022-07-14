@@ -123,17 +123,32 @@ namespace StockTicker.Pages
 
         public IActionResult OnPostAjaxSell()
         {
-            //do formla with money and amount of stock sold and adjust vars accordingly
 
-            return RedirectToPage("./Index");//probably change this
+            //maybe have a seperate div with a input box and button that appears when buy is clicked and make the other buttons disappear temporarily?
+            startDate = NextDay(startDate);
+            var dateTest = startDate.ToString("yyyy-MM-dd");
+            //progress the game state
+            apiCall = new ApiClass(test, dateTest);
+            test = apiCall.stock_.Symbol.ToString();
+            OpenPrice = apiCall.stock_.Open;
+            OpenPrice = Math.Truncate(OpenPrice * 100) / 100;
+            //ProgressGameplay(/*pass datetime from the users DB entry*/,/*pass stock symbol from users DB entry*/)
+            return new JsonResult($"The price for {test} is ${OpenPrice}");//probably change this
         }
         
         public IActionResult OnPostAjaxHold()
         {
-            //do nothing and progress the game state
-            //ProgressGameplay(/*pass datetime from the users DB entry*/,/*pass stock symbol from users DB entry*/);
 
-            return RedirectToPage("./Index");//probably change this
+            //maybe have a seperate div with a input box and button that appears when buy is clicked and make the other buttons disappear temporarily?
+            startDate = NextDay(startDate);
+            var dateTest = startDate.ToString("yyyy-MM-dd");
+            //progress the game state
+            apiCall = new ApiClass(test, dateTest);
+            test = apiCall.stock_.Symbol.ToString();
+            OpenPrice = apiCall.stock_.Open;
+            OpenPrice = Math.Truncate(OpenPrice * 100) / 100;
+            //ProgressGameplay(/*pass datetime from the users DB entry*/,/*pass stock symbol from users DB entry*/)
+            return new JsonResult($"The price for {test} is ${OpenPrice}");//probably change this
         }
 
         public IActionResult OnPostAjaxQuit()
