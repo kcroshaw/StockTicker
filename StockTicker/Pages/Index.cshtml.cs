@@ -108,6 +108,7 @@ namespace StockTicker.Pages
 
         public IActionResult OnPostAjaxBuy()
         {   //have user indicate how much stock to buy
+
             //maybe have a seperate div with a input box and button that appears when buy is clicked and make the other buttons disappear temporarily?
             startDate = NextDay(startDate);
             var dateTest = startDate.ToString("yyyy-MM-dd");
@@ -116,9 +117,7 @@ namespace StockTicker.Pages
             test = apiCall.stock_.Symbol.ToString();
             OpenPrice = apiCall.stock_.Open;
             OpenPrice = Math.Truncate(OpenPrice * 100) / 100;
-            //ProgressGameplay(/*pass datetime from the users DB entry*/,/*pass stock symbol from users DB entry*/);
-
-
+            //ProgressGameplay(/*pass datetime from the users DB entry*/,/*pass stock symbol from users DB entry*/)
             return new JsonResult($"The price for {test} is ${OpenPrice}");//probably change this
         }
 
