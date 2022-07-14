@@ -4,7 +4,6 @@ using StockTicker.Interfaces;
 using StockTicker.Data;
 using StockTicker.Models;
 using System;
-
 using ChartDirector;
 using System.Net;
 using Newtonsoft.Json;
@@ -27,7 +26,6 @@ namespace StockTicker.Pages
         public ApiClass apiCall;
 
         private DateTime startDate;
-
 
         public List<string> listOfStrings = new List<string>();
 
@@ -55,18 +53,10 @@ namespace StockTicker.Pages
 //***********Helper functions*************************
 
         //this function should be used to update the data shown on the charts 
-        public void ProgressGameplay(DateTime date, string stockSymbol)
+        public void ProgressGameplay(DateTime date)
         {
             //increase the date by 1 week
             tempDate = date.AddDays(7);
-            
-            //save new date to user database entry 
-
-
-            //call api again using new date?
-                      
-
-            //update chart with new data
 
             //increase week counter variable
             weekcounter++;
@@ -82,7 +72,6 @@ namespace StockTicker.Pages
 
         }
 
-
         public DateTime RandomDay()
         {
             Random gen = new Random();
@@ -95,28 +84,11 @@ namespace StockTicker.Pages
             }
                 return randDay;
         }
-        
-        public void InitGame()
-        {
-            //put $10,000 dollars into users DB entry
-
-            //save stock symbol to users DB entry
-            var stockSymb = Request.Form["stockSymbol"];
-
-            //find random a day to start on between 6 months and 10 years ago
-            RandomDay();//save this to users datbase entry
-
-        }
-
+ 
 //************Ajax functions**********************
 
         public IActionResult OnPostAjaxGameStart(string val)
         {
-            //initialize the game
-            //InitGame();
-
-            //call function that handles gameplay stuff
-            //ProgressGameplay(/*pass datetime from the users DB entry*/,/*pass stock symbol from users DB entry*/);
             //Call api and assign response to Stock Object with selected ticker and date
             startDate = RandomDay();
             var dateTest = startDate.ToString("yyyy-MM-dd");
@@ -124,35 +96,19 @@ namespace StockTicker.Pages
             test = apiCall.stock_.Symbol.ToString();
             OpenPrice = apiCall.stock_.Open;
             OpenPrice = Math.Truncate(OpenPrice * 100) / 100;
-            return new JsonResult($"The price for {test} is ${OpenPrice}");//probably change this
+            return new JsonResult($"The price for {test} is ${OpenPrice} - ");
         }
 
         public IActionResult OnPostAjaxBuy()
         {
-            //have user indicate how much stock to buy
-            //maybe have a seperate div with a input box and button that appears when buy is clicked and make the other buttons disappear temporarily?
-            startDate = NextDay();
-            var dateTest = startDate.ToString("yyyy-MM-dd");
-            //progress the game state
-            apiCall = new ApiClass(test, dateTest);
-            test = apiCall.stock_.Symbol.ToString();
-            OpenPrice = apiCall.stock_.Open;
-            OpenPrice = Math.Truncate(OpenPrice * 100) / 100;
-            //ProgressGameplay(/*pass datetime from the users DB entry*/,/*pass stock symbol from users DB entry*/);
-
-
-            return new JsonResult($"The price for {test} is ${OpenPrice}");//probably change this
+            //do formula with money and amount of stock bought and adjust vars accordingly
+            
+            return RedirectToPage("./Index");//probably change this
         }
 
         public IActionResult OnPostAjaxSell()
         {
-            // have user select how much stock to sell
-            //maybe have a seperate div with a input box and button that appears when sell is clicked and make the other buttons disappear temporarily?
-
-            //add dollar amount to users account
-
-            //progress the game state
-            //ProgressGameplay(/*pass datetime from the users DB entry*/,/*pass stock symbol from users DB entry*/);
+            //do formla with money and amount of stock sold and adjust vars accordingly
 
             return RedirectToPage("./Index");//probably change this
         }

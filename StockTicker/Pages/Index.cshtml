@@ -33,46 +33,50 @@
 
 
 <!--after above info is submitted and saved to DB unhide this div-->
-    <div id="gameArea" class="text-center" style="visibility:hidden" runat="server">
+<div id="gameArea" class="text-center" style="visibility:hidden" runat="server">
 
     <!--Show graph here-->
-    <div id="graph">GRAPH</div><br/>
+    <div id="graph">
     <center>
         <div id="tester" style="width:600px;height:250px;"></div>
-        <div class="slidecontainer">
-            <input type="range" min="1" max="@Model.Balance" value="50" class="slider" id="myRange">
-            <p>Amount: <span id="demo"></span></p>
-        </div>
     </center>
+    </div><br/>
 
     <!--users bank account-->
-    <div class="text-center">  
-    <table class="account-info">
-        <tr>
-            <th class="account-info">Bank Account:</th>
-            <td class="account-info">$@Model.Balance</td>
-        </tr>
-        <tr>
-            <th class="account-info">Owned Stock:</th>
-            <td class="account-info">@Model.StockOwned</td>
-        </tr>
-    </table>
-    <br/>
+
+        <table class="account-info">
+            <tr>
+                <th class="account-info">Bank Account:</th>
+                <td class="account-info">$@Model.Balance</td>
+            </tr>
+            <tr>
+                <th class="account-info">Owned Stock:</th>
+                <td class="account-info">@Model.StockOwned</td>
+            </tr>
+        </table>
+        <br/>
     
-    <form id="menu" method="post">
-        <!--buttons for buy or sell-->
-        <div id="stockInfo"></div>
-        <span>Would you like to Buy, Sell, Hold, or Quit?</span><br />
-        <input asp-page-handler="Buy" type="radio" id="buyButton" name="bshbtn" value="Buy" onclick="showBuySellInput()">Buy</>
-        <input asp-page-handler="Sell" type="radio" id="sellButton" name="bshbtn" value="Sell" onclick="showBuySellInput()" />Sell</>
-        <input asp-page-handler="Hold" type="radio" id="holdButton" name="bshbtn" value="Hold" onclick="showBuySellInput()"/>Hold</><br />
-        <input type="text" id="buySellInput" style="visibility:hidden" /><br /><br />
-        <!--quit button-->
-        <input type="button" name="acceptButton" value="Accept" onclick=""/><br/>
-        <input type="button" name="quitButton" value="Quit" />
-    </form>
-    </div>
+        <form id="menu" method="post">
+            <!--buttons for buy or sell-->
+            <div id="stockInfo"></div>
+            <span>Would you like to Buy, Sell, Hold, or Quit?</span><br />
+            <input asp-page-handler="Buy" type="radio" id="buyButton" name="bshbtn" value="Buy" onclick="showBuySellInput()">Buy</>
+            <input asp-page-handler="Sell" type="radio" id="sellButton" name="bshbtn" value="Sell" onclick="showBuySellInput()" />Sell</>
+            <input asp-page-handler="Hold" type="radio" id="holdButton" name="bshbtn" value="Hold" onclick="showBuySellInput()"/>Hold</><br />
+            <input type="text" id="buySellInput" style="visibility:hidden" /><br /><br />
+            <center>
+            <div class="slidecontainer" id="slider" style="visibility:hidden">
+                <input type="range" min="0" max="@Model.Balance" value="50" class="slider" id="myRange">
+                <p>Amount: <span id="demo"></span></p>
+            </div>
+            </center>
+            <!--quit button-->
+            <input type="button" name="acceptButton" value="Accept" /><br /><br />
+            <input type="button" name="quitButton" value="Quit" />
+        </form>
+
 </div>
+
 </html>
 
 @section Scripts
@@ -98,9 +102,11 @@
             var hold = document.getElementById("holdButton");
             if (hold.checked) {
                 document.getElementById("buySellInput").style.visibility = 'hidden';
+                document.getElementById("slider").style.visibility = 'hidden';
             }
             else {
                 document.getElementById("buySellInput").style.visibility = 'visible';
+                document.getElementById("slider").style.visibility = 'visible';
             }
         }
     </script>
@@ -119,9 +125,9 @@
     
     <!--Ajax Scripts-->
     <script type="text/javascript">
-    
+        
+        //initialize the game
         $("#startButton").click(function() {
-            //var symbol = document.getElementById("stockSymbol").options[document.getElementById("stockSymbol")].value;
             var e = document.getElementById("stockSymbol");
             var strUser = e.value;
             $.ajax({
@@ -141,6 +147,91 @@
             });
         });
 
+        //function to handle accept button (buy/sell/hold)
+        $("#acceptButton").click(function() {
+
+            var button = $("input[type=radio][name=bshbtn]:checked").val();
+            
+            if(button == "Buy")//buy 
+            {
+                $.ajax({
+                    type: "POST",
+                    url: "/Index?handler=AjaxBuy",
+                    data: { },
+                    contentType: 'application/x-www-form-urlencoded',
+                    dataType: "json",
+                    headers:
+                    {
+                        "RequestVerificationToken": $('input:hidden[name="__RequestVerificationToken"]').val()
+                    },
+                    success: function(message) {
+                    
+                        
+                    }
+                });
+            }
+            else if(button == "Sell")//sell
+            {
+                $.ajax({
+                    type: "POST",
+                    url: "/Index?handler=AjaxSell",
+                    data: {  },
+                    contentType: 'application/x-www-form-urlencoded',
+                    dataType: "json",
+                    headers:
+                    {
+                        "RequestVerificationToken": $('input:hidden[name="__RequestVerificationToken"]').val()
+                    },
+                    success: function() {
+                    
+                        
+                    }
+                });
+            }
+            else if(button == "Hold")//hold 
+            {
+                $.ajax({
+                    type: "POST",
+                    url: "/Index?handler=AjaxHold",
+                    data: {  },
+                    contentType: 'application/x-www-form-urlencoded',
+                    dataType: "json",
+                    headers:
+                    {
+                        "RequestVerificationToken": $('input:hidden[name="__RequestVerificationToken"]').val()
+                    },
+                    success: function() {
+                    
+                        
+                    }
+                });
+            }
+            else { break; }
+        });
+
+
+        //function to quit game
+        $("#quitButton").click(function() {
+            $.ajax({
+                type: "POST",
+                url: "/Index?handler=AjaxQuit",
+                data: {  },
+                contentType: 'application/x-www-form-urlencoded',
+                dataType: "json",
+                headers:
+                {
+                    "RequestVerificationToken": $('input:hidden[name="__RequestVerificationToken"]').val()
+                },
+                success: function() {
+                    
+                }
+            });
+        });
+               
+    </script>
+
+    <script>
+        
         var slider = document.getElementById("myRange");
         var output = document.getElementById("demo");
         output.innerHTML = slider.value;
@@ -148,6 +239,5 @@
         slider.oninput = function () {
             output.innerHTML = this.value;
         }
-
     </script>
 }
