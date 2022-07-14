@@ -28,6 +28,7 @@ namespace StockTicker.Pages
 
         private DateTime startDate;
 
+
         public List<string> listOfStrings = new List<string>();
 
         public string test;
@@ -130,11 +131,17 @@ namespace StockTicker.Pages
         {
             //have user indicate how much stock to buy
             //maybe have a seperate div with a input box and button that appears when buy is clicked and make the other buttons disappear temporarily?
-
+            startDate = NextDay();
+            var dateTest = startDate.ToString("yyyy-MM-dd");
             //progress the game state
+            apiCall = new ApiClass(test, dateTest);
+            test = apiCall.stock_.Symbol.ToString();
+            OpenPrice = apiCall.stock_.Open;
+            OpenPrice = Math.Truncate(OpenPrice * 100) / 100;
             //ProgressGameplay(/*pass datetime from the users DB entry*/,/*pass stock symbol from users DB entry*/);
-            
-            return RedirectToPage("./Index");//probably change this
+
+
+            return new JsonResult($"The price for {test} is ${OpenPrice}");//probably change this
         }
 
         public IActionResult OnPostAjaxSell()
