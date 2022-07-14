@@ -53,22 +53,18 @@ namespace StockTicker.Pages
 //***********Helper functions*************************
 
         //this function should be used to update the data shown on the charts 
-        public void ProgressGameplay(DateTime date)
+        public string ProgressGameplay()
         {
-            //increase the date by 1 week
-            tempDate = date.AddDays(7);
-
-            //increase week counter variable
-            weekcounter++;
-
-            //check to see if 7 weeks have passed and quit game if yes?
-            if(weekcounter > 7)
-            {
-                //end game
-                    //sell all remaining stocks
-                    //update bank account
-                    //post results
-            }
+            //maybe have a seperate div with a input box and button that appears when buy is clicked and make the other buttons disappear temporarily?
+            startDate = NextDay(startDate);
+            var dateTest = startDate.ToString("yyyy-MM-dd");
+            //progress the game state
+            apiCall = new ApiClass(test, dateTest);
+            test = apiCall.stock_.Symbol.ToString();
+            OpenPrice = apiCall.stock_.Open;
+            OpenPrice = Math.Truncate(OpenPrice * 100) / 100;
+            //ProgressGameplay(/*pass datetime from the users DB entry*/,/*pass stock symbol from users DB entry*/)
+            return "The price for {test} is ${OpenPrice}";
 
         }
 
@@ -107,48 +103,17 @@ namespace StockTicker.Pages
 
 
         public IActionResult OnPostAjaxBuy()
-        {   //have user indicate how much stock to buy
-
-            //maybe have a seperate div with a input box and button that appears when buy is clicked and make the other buttons disappear temporarily?
-            startDate = NextDay(startDate);
-            var dateTest = startDate.ToString("yyyy-MM-dd");
-            //progress the game state
-            apiCall = new ApiClass(test, dateTest);
-            test = apiCall.stock_.Symbol.ToString();
-            OpenPrice = apiCall.stock_.Open;
-            OpenPrice = Math.Truncate(OpenPrice * 100) / 100;
-            //ProgressGameplay(/*pass datetime from the users DB entry*/,/*pass stock symbol from users DB entry*/)
-            return new JsonResult($"The price for {test} is ${OpenPrice}");//probably change this
+        {   return new JsonResult(ProgressGameplay());
         }
 
         public IActionResult OnPostAjaxSell()
         {
-
-            //maybe have a seperate div with a input box and button that appears when buy is clicked and make the other buttons disappear temporarily?
-            startDate = NextDay(startDate);
-            var dateTest = startDate.ToString("yyyy-MM-dd");
-            //progress the game state
-            apiCall = new ApiClass(test, dateTest);
-            test = apiCall.stock_.Symbol.ToString();
-            OpenPrice = apiCall.stock_.Open;
-            OpenPrice = Math.Truncate(OpenPrice * 100) / 100;
-            //ProgressGameplay(/*pass datetime from the users DB entry*/,/*pass stock symbol from users DB entry*/)
-            return new JsonResult($"The price for {test} is ${OpenPrice}");//probably change this
+            return new JsonResult(ProgressGameplay());
         }
-        
+
         public IActionResult OnPostAjaxHold()
         {
-
-            //maybe have a seperate div with a input box and button that appears when buy is clicked and make the other buttons disappear temporarily?
-            startDate = NextDay(startDate);
-            var dateTest = startDate.ToString("yyyy-MM-dd");
-            //progress the game state
-            apiCall = new ApiClass(test, dateTest);
-            test = apiCall.stock_.Symbol.ToString();
-            OpenPrice = apiCall.stock_.Open;
-            OpenPrice = Math.Truncate(OpenPrice * 100) / 100;
-            //ProgressGameplay(/*pass datetime from the users DB entry*/,/*pass stock symbol from users DB entry*/)
-            return new JsonResult($"The price for {test} is ${OpenPrice}");//probably change this
+            return new JsonResult(ProgressGameplay());
         }
 
         public IActionResult OnPostAjaxQuit()
