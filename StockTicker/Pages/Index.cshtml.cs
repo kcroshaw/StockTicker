@@ -84,8 +84,14 @@ namespace StockTicker.Pages
             }
                 return randDay;
         }
- 
-//************Ajax functions**********************
+
+        public DateTime NextDay(DateTime start)
+        {
+            DateTime Day = start.AddDays(7);
+            return Day;
+        }
+
+        //************Ajax functions**********************
 
         public IActionResult OnPostAjaxGameStart(string val)
         {
@@ -99,11 +105,21 @@ namespace StockTicker.Pages
             return new JsonResult($"The price for {test} is ${OpenPrice} - ");
         }
 
+
         public IActionResult OnPostAjaxBuy()
-        {
-            //do formula with money and amount of stock bought and adjust vars accordingly
-            
-            return RedirectToPage("./Index");//probably change this
+        {   //have user indicate how much stock to buy
+            //maybe have a seperate div with a input box and button that appears when buy is clicked and make the other buttons disappear temporarily?
+            startDate = NextDay(startDate);
+            var dateTest = startDate.ToString("yyyy-MM-dd");
+            //progress the game state
+            apiCall = new ApiClass(test, dateTest);
+            test = apiCall.stock_.Symbol.ToString();
+            OpenPrice = apiCall.stock_.Open;
+            OpenPrice = Math.Truncate(OpenPrice * 100) / 100;
+            //ProgressGameplay(/*pass datetime from the users DB entry*/,/*pass stock symbol from users DB entry*/);
+
+
+            return new JsonResult($"The price for {test} is ${OpenPrice}");//probably change this
         }
 
         public IActionResult OnPostAjaxSell()
