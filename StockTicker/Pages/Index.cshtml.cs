@@ -95,7 +95,13 @@ namespace StockTicker.Pages
             }
                 return randDay;
         }
-        
+
+        public DateTime NextDay(DateTime start)
+        {
+            DateTime Day = start.AddDays(7);
+            return Day;
+        }
+
         public void InitGame()
         {
             //put $10,000 dollars into users DB entry
@@ -131,7 +137,7 @@ namespace StockTicker.Pages
         {
             //have user indicate how much stock to buy
             //maybe have a seperate div with a input box and button that appears when buy is clicked and make the other buttons disappear temporarily?
-            startDate = NextDay();
+            startDate = NextDay(startDate);
             var dateTest = startDate.ToString("yyyy-MM-dd");
             //progress the game state
             apiCall = new ApiClass(test, dateTest);
