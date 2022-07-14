@@ -71,7 +71,9 @@
             </div>
             </center>
             <!--quit button-->
+            @Html.AntiForgeryToken()
             <input type="button" name="acceptButton" value="Accept" /><br /><br />
+            @Html.AntiForgeryToken()
             <input type="button" name="quitButton" value="Quit" />
         </form>
 
@@ -146,18 +148,22 @@
                 }
             });
         });
+    </script>
 
+    <script type="text/javascript">    
         //function to handle accept button (buy/sell/hold)
         $("#acceptButton").click(function() {
 
             var button = $("input[type=radio][name=bshbtn]:checked").val();
             
-            if(button == "Buy")//buy 
+            if(button == "Buy")//buy-pass in amount of stock to buy
             {
+                var e = document.getElementById("buySellInput");
+                var amount = e.value;
                 $.ajax({
                     type: "POST",
                     url: "/Index?handler=AjaxBuy",
-                    data: { },
+                    data: { "val": amount },
                     contentType: 'application/x-www-form-urlencoded',
                     dataType: "json",
                     headers:
@@ -170,12 +176,12 @@
                     }
                 });
             }
-            else if(button == "Sell")//sell
+            else if(button == "Sell")//sell-pass in amount of stock to sell
             {
                 $.ajax({
                     type: "POST",
                     url: "/Index?handler=AjaxSell",
-                    data: {  },
+                    data: { "val": amount },
                     contentType: 'application/x-www-form-urlencoded',
                     dataType: "json",
                     headers:
@@ -208,8 +214,9 @@
             }
             else { break; }
         });
+    </script>
 
-
+    <script type="text/javascript">
         //function to quit game
         $("#quitButton").click(function() {
             $.ajax({
@@ -230,7 +237,7 @@
                
     </script>
 
-    <script>
+    <script type="text/javascript">
         
         var slider = document.getElementById("myRange");
         var output = document.getElementById("demo");

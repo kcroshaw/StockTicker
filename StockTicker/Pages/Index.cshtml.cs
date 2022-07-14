@@ -22,6 +22,7 @@ namespace StockTicker.Pages
         
         private int weekcounter = 0;
         private DateTime tempDate;
+        
 
         public ApiClass apiCall;
 
@@ -53,22 +54,32 @@ namespace StockTicker.Pages
 //***********Helper functions*************************
 
         //this function should be used to update the data shown on the charts 
-        public void ProgressGameplay(DateTime date)
+        public string ProgressGameplay(string val)
         {
             //increase the date by 1 week
-            tempDate = date.AddDays(7);
+            startDate = startDate.AddDays(7);
 
             //increase week counter variable
             weekcounter++;
 
             //check to see if 7 weeks have passed and quit game if yes?
-            if(weekcounter > 7)
+            if (weekcounter > 7)
             {
                 //end game
-                    //sell all remaining stocks
-                    //update bank account
-                    //post results
+                //sell all remaining stocks
+                //update bank account
+                //post results
             }
+            else
+            {
+                var dateTest = startDate.ToString("yyyy-MM-dd");
+                apiCall = new ApiClass(val, dateTest);
+                test = apiCall.stock_.Symbol.ToString();
+                OpenPrice = apiCall.stock_.Open;
+                OpenPrice = Math.Truncate(OpenPrice * 100) / 100;
+            }
+
+            return $"The price for {test} is ${OpenPrice} - ";
 
         }
 
@@ -99,26 +110,29 @@ namespace StockTicker.Pages
             return new JsonResult($"The price for {test} is ${OpenPrice} - ");
         }
 
-        public IActionResult OnPostAjaxBuy()
+        public IActionResult OnPostAjaxBuy(string val)//pass in amount of stocks to buy
         {
-            //do formula with money and amount of stock bought and adjust vars accordingly
+            //int amount = (int)val;
             
-            return RedirectToPage("./Index");//probably change this
+            //do formula with money and amount of stock bought and adjust vars accordingly
+
+            
+            return new JsonResult(ProgressGameplay(val));
         }
 
-        public IActionResult OnPostAjaxSell()
+        public IActionResult OnPostAjaxSell(string val)//pass in amount of stocks to sell
         {
             //do formla with money and amount of stock sold and adjust vars accordingly
 
-            return RedirectToPage("./Index");//probably change this
+            return new JsonResult(ProgressGameplay(val));
         }
         
-        public IActionResult OnPostAjaxHold()
+        public IActionResult OnPostAjaxHold(string val)
         {
             //do nothing and progress the game state
             //ProgressGameplay(/*pass datetime from the users DB entry*/,/*pass stock symbol from users DB entry*/);
 
-            return RedirectToPage("./Index");//probably change this
+            return new JsonResult(ProgressGameplay(val));
         }
 
         public IActionResult OnPostAjaxQuit()
