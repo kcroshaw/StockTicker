@@ -62,13 +62,13 @@
             <span>Would you like to Buy, Sell, Hold, or Quit?</span><br />
             <input asp-page-handler="Buy" type="radio" id="buyButton" name="bshbtn" value="Buy" onclick="showBuySellInput()">Buy</>
             <input asp-page-handler="Sell" type="radio" id="sellButton" name="bshbtn" value="Sell" onclick="showBuySellInput()" />Sell</>
-            <input asp-page-handler="Hold" type="radio" id="holdButton" name="bshbtn" value="Hold" onclick="showBuySellInput()"/>Hold</><br />
-            <input type="text" id="buySellInput" style="visibility:hidden" /><br /><br />
+            <input asp-page-handler="Hold" type="radio" id="holdButton" name="bshbtn" value="Hold" onclick="showBuySellInput()" />Hold</><br />
+            <input type="text" id="buySellInput" style="visibility:hidden" onkeyup="updateSlider(document.getElementById('buySellInput').value)" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" /><br /><br />
             <center>
-            <div class="slidecontainer" id="slider" style="visibility:hidden">
-                <input type="range" min="0" max="@Model.Balance" value="50" class="slider" id="myRange">
-                <p>Amount: <span id="demo"></span></p>
-            </div>
+                <div class="slidecontainer" id="slider" style="visibility:hidden">
+                    <input type="range" min="0" max="@Model.Balance" value="1" class="slider" id="myRange">
+                    <p>Amount: <span id="demo"></span></p>
+                </div>
             </center>
             <!--quit button-->
             @Html.AntiForgeryToken()
@@ -124,6 +124,11 @@
 
         };
     </script>
+
+    <script>function updateSlider(amount) {
+            document.getElementById("myRange").value = amount;
+            document.getElementById("demo").innerHTML = amount;
+        };</script>
     
     <!--Ajax Scripts-->
     <script type="text/javascript">
@@ -241,10 +246,13 @@
         
         var slider = document.getElementById("myRange");
         var output = document.getElementById("demo");
+        var amountToBuySellText = document.getElementById("buySellInput");
+
         output.innerHTML = slider.value;
 
         slider.oninput = function () {
             output.innerHTML = this.value;
+            amountToBuySellText.value = this.value;
         }
     </script>
 }
