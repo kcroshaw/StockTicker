@@ -102,17 +102,30 @@ namespace StockTicker.Pages
         }
 
 
-        public IActionResult OnPostAjaxBuy()
-        {   return new JsonResult(ProgressGameplay());
+        public IActionResult OnPostAjaxBuy(string val)
+        {
+            int amount = Convert.ToInt32(val);
+            //do stock and money algorithm
+
+
+            
+            return new JsonResult(ProgressGameplay());
         }
 
-        public IActionResult OnPostAjaxSell()
+        public IActionResult OnPostAjaxSell(string val)
         {
+            int amount = Convert.ToInt32(val);
+            //do stock and money algorithm
+
             return new JsonResult(ProgressGameplay());
         }
 
         public IActionResult OnPostAjaxHold()
         {
+            //do nothing and progress the game
+
+
+
             return new JsonResult(ProgressGameplay());
         }
 
