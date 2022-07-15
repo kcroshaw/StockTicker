@@ -20,8 +20,6 @@ namespace StockTicker.Pages
             _logger = logger;
         }
         
-        private int weekcounter = 0;
-        private DateTime tempDate;
 
         public ApiClass apiCall;
 
@@ -55,15 +53,19 @@ namespace StockTicker.Pages
         //this function should be used to update the data shown on the charts 
         public string ProgressGameplay()
         {
-            //maybe have a seperate div with a input box and button that appears when buy is clicked and make the other buttons disappear temporarily?
             startDate = NextDay(startDate);
+            //check if the day is today or in the future, if so we need to quit or it will break
+            if (startDate >= DateTime.Now)
+            {
+                return QuitGame();
+            }
             var dateTest = startDate.ToString("yyyy-MM-dd");
             //progress the game state
             apiCall = new ApiClass(test, dateTest);
             test = apiCall.stock_.Symbol.ToString();
             OpenPrice = apiCall.stock_.Open;
             OpenPrice = Math.Truncate(OpenPrice * 100) / 100;
-            //ProgressGameplay(/*pass datetime from the users DB entry*/,/*pass stock symbol from users DB entry*/)
+            
             return "The price for {test} is ${OpenPrice}";
 
         }
@@ -87,6 +89,17 @@ namespace StockTicker.Pages
             return Day;
         }
 
+        //quit game completely
+        public string QuitGame()
+        {
+            //sell all stock the user has and add the money to bank account
+            double amount = StockOwned * OpenPrice;
+            Balance += amount;
+
+            //TODO: show ending results by returning a string to the Ajax handler
+            return "PLACEHOLDER";
+        }
+
         //************Ajax functions**********************
 
         public IActionResult OnPostAjaxGameStart(string val)
@@ -104,20 +117,38 @@ namespace StockTicker.Pages
 
         public IActionResult OnPostAjaxBuy(string val)
         {
-            int amount = Convert.ToInt32(val);
-            //do stock and money algorithm
-
-
+            int buyAmount = Convert.ToInt32(val);
+            double cost = OpenPrice * buyAmount;
+            //check to see if we have enough money
+            if (cost > Balance)
+            {
+                return new JsonResult("You do not have enough money to buy " + val + " shares.");
+            }
             
-            return new JsonResult(ProgressGameplay());
+            //do stock and money algorithm
+            Balance -= cost;
+            StockOwned += buyAmount;
+
+            //return new JsonResult("You bought " + val + " shares and spent  $" + cost +" \n\r"+ ProgressGameplay());
+            return new JsonResult("You bought " + val + " shares and spent  $" + cost + " \n\r");
         }
 
         public IActionResult OnPostAjaxSell(string val)
         {
-            int amount = Convert.ToInt32(val);
-            //do stock and money algorithm
+            int sellAmount = Convert.ToInt32(val);
 
-            return new JsonResult(ProgressGameplay());
+            //check to see if we even have enough stock to sell
+            if (sellAmount > StockOwned)
+            {
+                return new JsonResult("You do not have enough stock to sell " + val + " shares.");
+            }
+            
+            //do stock and money algorithm
+            double money = OpenPrice * sellAmount;
+            Balance += money;
+            StockOwned -= sellAmount;
+
+            return new JsonResult("You sold " + val + " shares and made $" + money + " \n\r" + ProgressGameplay());
         }
 
         public IActionResult OnPostAjaxHold()
@@ -126,16 +157,12 @@ namespace StockTicker.Pages
 
 
 
-            return new JsonResult(ProgressGameplay());
+            return new JsonResult("You decided to hold. " + " \n\r" + ProgressGameplay());
         }
 
         public IActionResult OnPostAjaxQuit()
         {
-            //quit game completely
-            //sell all stock the user has and add the money to bank account
-            //show ending results
-
-            return RedirectToPage("./Index");//probably change this
+            return new JsonResult(QuitGame()); 
         }
 
     }

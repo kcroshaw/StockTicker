@@ -60,9 +60,9 @@
             <!--buttons for buy or sell-->
             <div id="stockInfo"></div>
             <span>Would you like to Buy, Sell, Hold, or Quit?</span><br />
-            <input asp-page-handler="Buy" type="radio" id="buyButton" name="bshbtn" value="Buy" onclick="showBuySellInput()">Buy</>
-            <input asp-page-handler="Sell" type="radio" id="sellButton" name="bshbtn" value="Sell" onclick="showBuySellInput()" />Sell</>
-            <input asp-page-handler="Hold" type="radio" id="holdButton" name="bshbtn" value="Hold" onclick="showBuySellInput()" />Hold</><br />
+            <input type="radio" id="buyButton" name="bshbtn" value="Buy" onclick="showBuySellInput()">Buy</>
+            <input type="radio" id="sellButton" name="bshbtn" value="Sell" onclick="showBuySellInput()" />Sell</>
+            <input type="radio" id="holdButton" name="bshbtn" value="Hold" onclick="showBuySellInput()" />Hold</><br />
             <input type="text" id="buySellInput" style="visibility:hidden" onkeyup="updateSlider(document.getElementById('buySellInput').value)" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" /><br /><br />
             <center>
                 <div class="slidecontainer" id="slider" style="visibility:hidden">
@@ -70,11 +70,11 @@
                     <p>Amount: <span id="demo"></span></p>
                 </div>
             </center>
-            <!--quit button-->
+        
             @Html.AntiForgeryToken()
-            <input type="button" name="acceptButton" value="Accept" /><br /><br />
+            <input type="button" id="acceptButton" value="Accept" /><br /><br />
             @Html.AntiForgeryToken()
-            <input type="button" name="quitButton" value="Quit" />
+            <input type="button" id="quitButton" value="Quit" />
         </form>
 
 </div>
@@ -87,7 +87,8 @@
     <script src="https://cdn.plot.ly/plotly-2.12.1.min.js"></script>
     <script src="plotly-2.12.1.min.js"></script>
 
-    <script>
+<!--load account info-->
+    <script> 
         var data = [
             {
                 x: ['Bank Account', 'Stocks'],
@@ -99,6 +100,7 @@
         Plotly.newPlot('tester', data);
     </script>
 
+<!--show BuySell input-->
     <script type="text/javascript">
         function showBuySellInput() {
             var hold = document.getElementById("holdButton");
@@ -112,7 +114,7 @@
             }
         }
     </script>
-    
+<!--Toggle div-->
     <script type="text/javascript">
 
         //function to hide/show divs on start button click
@@ -125,12 +127,32 @@
         };
     </script>
 
-    <script>function updateSlider(amount) {
+<!--update slider amount-->
+    <script>
+        function updateSlider(amount) {
             document.getElementById("myRange").value = amount;
             document.getElementById("demo").innerHTML = amount;
-        };</script>
+        };
+     </script>
+
+<!--Slider stuff-->
+    <script type="text/javascript">
+        
+        var slider = document.getElementById("myRange");
+        var output = document.getElementById("demo");
+        var amountToBuySellText = document.getElementById("buySellInput");
+
+        output.innerHTML = slider.value;
+
+        slider.oninput = function () {
+            output.innerHTML = this.value;
+            amountToBuySellText.value = this.value;
+        }
+    </script>
     
-    <!--Ajax Scripts-->
+<!--Ajax Scripts-->
+    
+<!--Start Game-->
     <script type="text/javascript">
         
         //initialize the game
@@ -154,17 +176,18 @@
             });
         });
     </script>
-
+    
+<!--Accept Button-->
     <script type="text/javascript">    
+        
         //function to handle accept button (buy/sell/hold)
         $("#acceptButton").click(function() {
 
-            var button = $("input[type=radio][name=bshbtn]:checked").val();
+            var e = document.getElementById("buySellInput");
+            var amount = e.value;
             
-            if(button == "Buy")//buy-pass in amount of stock to buy
+            if(document.getElementById('buyButton').checked)//buy: pass in amount of stock to buy
             {
-                var e = document.getElementById("buySellInput");
-                var amount = e.value;
                 $.ajax({
                     type: "POST",
                     url: "/Index?handler=AjaxBuy",
@@ -177,11 +200,11 @@
                     },
                     success: function(message) {
                     
-                        
+                        document.getElementById("stockInfo").innerHTML = message;
                     }
                 });
             }
-            else if(button == "Sell")//sell-pass in amount of stock to sell
+            else if(document.getElementById('sellButton').checked)//sell: pass in amount of stock to sell
             {
                 $.ajax({
                     type: "POST",
@@ -193,13 +216,13 @@
                     {
                         "RequestVerificationToken": $('input:hidden[name="__RequestVerificationToken"]').val()
                     },
-                    success: function() {
+                    success: function(message) {
                     
-                        
+                        document.getElementById("stockInfo").innerHTML = message;
                     }
                 });
             }
-            else if(button == "Hold")//hold 
+            else if(document.getElementById('holdButton').checked)//hold 
             {
                 $.ajax({
                     type: "POST",
@@ -211,19 +234,20 @@
                     {
                         "RequestVerificationToken": $('input:hidden[name="__RequestVerificationToken"]').val()
                     },
-                    success: function() {
+                    success: function(message) {
                     
-                        
+                        document.getElementById("stockInfo").innerHTML = message;
                     }
                 });
             }
             else { break; }
         });
     </script>
-
+@*
+    <!--Quit Button-->
     <script type="text/javascript">
         //function to quit game
-        $("#quitButton").click(function() {
+        $("#quitButton").click(function(message) {
             $.ajax({
                 type: "POST",
                 url: "/Index?handler=AjaxQuit",
@@ -240,19 +264,5 @@
             });
         });
                
-    </script>
-
-    <script type="text/javascript">
-        
-        var slider = document.getElementById("myRange");
-        var output = document.getElementById("demo");
-        var amountToBuySellText = document.getElementById("buySellInput");
-
-        output.innerHTML = slider.value;
-
-        slider.oninput = function () {
-            output.innerHTML = this.value;
-            amountToBuySellText.value = this.value;
-        }
-    </script>
+    </script>*@
 }
