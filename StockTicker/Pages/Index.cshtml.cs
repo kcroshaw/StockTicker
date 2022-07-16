@@ -21,7 +21,7 @@ namespace StockTicker.Pages
 
         public List<string> listOfStrings = new List<string>();
 
-        public string test;
+        public string tickerSymbol;
         
         //DONT USE THESE TO STORE DATA - only use as temp vars if necessary
         public DateTime tempDate;
@@ -67,8 +67,8 @@ namespace StockTicker.Pages
             }
             var dateTest = tempDate.ToString("yyyy-MM-dd");
             //progress the game state
-            apiCall = new ApiClass(test, dateTest);
-            test = apiCall.stock_.Symbol.ToString();
+            apiCall = new ApiClass(tickerSymbol, dateTest);
+            tickerSymbol = apiCall.stock_.Symbol.ToString();
             tempOpenPrice = apiCall.stock_.Open;
             tempOpenPrice = Math.Truncate(tempOpenPrice * 100) / 100;
 
@@ -118,7 +118,7 @@ namespace StockTicker.Pages
             tempDate = RandomDay();
             var dateTest = tempDate.ToString("yyyy-MM-dd");
             apiCall = new ApiClass(val, dateTest);
-            test = apiCall.stock_.Symbol.ToString();
+            tickerSymbol = apiCall.stock_.Symbol.ToString();
             tempOpenPrice = apiCall.stock_.Open;
             tempOpenPrice = Math.Truncate(tempOpenPrice * 100) / 100;
 
@@ -127,7 +127,7 @@ namespace StockTicker.Pages
             _stockObj.Date = tempDate;
             _stockObj.Balance = 100000.00;
 
-            return new JsonResult($"The price for {test} is ${tempOpenPrice} - ");
+            return new JsonResult($"The price for {tickerSymbol} is ${tempOpenPrice} - ");
         }
 
 
