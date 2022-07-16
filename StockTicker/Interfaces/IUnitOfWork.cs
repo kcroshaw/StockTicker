@@ -1,9 +1,9 @@
-﻿namespace StockTicker.Interfaces
+﻿using StockTicker.Models;
+namespace StockTicker.Interfaces
 {
     public interface IUnitOfWork
     {
-        //public IGenericRepository<ApplicationUser> ApplicationUser { get; }
-        //public IGenericRepository<Transaction> Transaction { get; }
+        public IGenericRepository<Stock> Stock { get; }
 
         int Commit();
         Task<int> CommitAsync();

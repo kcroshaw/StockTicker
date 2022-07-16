@@ -16,5 +16,7 @@ namespace StockTicker.Models
 
         public DateTime Date { get; set; }
 
+        public string Symbol { get; set; }
+
     }
 }

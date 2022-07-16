@@ -22,14 +22,14 @@ namespace StockTicker.Pages
         public List<string> listOfStrings = new List<string>();
 
 
-        //DONT USE THESE TO STORE PERSISTENT DATA - only use as temp vars if necessary
-        public string tickerSymbol = "";
+        //DONT USE THESE TO STORE PERSISTENT DATA - only use as temp vars as necessary
+        public string tempTickerSymbol = " ";
 
         public DateTime tempDate;
 
         public double tempOpenPrice = 0.0;
         
-        public double tempBalance = 0.00;
+        public double tempBalance = 0.0;
         
         public int tempStockOwned = 0;
         //******************************************************************
@@ -38,19 +38,23 @@ namespace StockTicker.Pages
         {
             _logger = logger;
         }
-  
+
+
+/******************DONT KNOW IF THIS IS THE RIGHT WAY TO DO IT*************/
+
         public Stock StockObj { get; set; }
+
+/*********************************************************************************/
 
         public IActionResult OnGet()
         {
             if (User.Identity.IsAuthenticated)
             {
-                //set temp vars equal to their respective data members in the stock model
-                tickerSymbol = StockObj.Symbol;
-                tempDate = StockObj.Date;
-                tempOpenPrice = StockObj.Open;
+                //TODO: need to load temp vars with data from stock model so show accurate feedback on html page
                 tempBalance = StockObj.Balance;
-                tempStockOwned = StockObj.StockOwned;               
+                tempStockOwned = StockObj.StockOwned;
+                //tempStockOwned =
+                
                 
                 return Page();
             }
@@ -75,7 +79,7 @@ namespace StockTicker.Pages
             var dateTest = tempDate.ToString("yyyy-MM-dd");
             //progress the game state
             apiCall = new ApiClass(StockObj.Symbol, dateTest);
-            tickerSymbol = apiCall.stock_.Symbol.ToString();
+            tempTickerSymbol = apiCall.stock_.Symbol.ToString();
             tempOpenPrice = apiCall.stock_.Open;
             tempOpenPrice = Math.Truncate(tempOpenPrice * 100) / 100;
 
@@ -83,7 +87,7 @@ namespace StockTicker.Pages
             StockObj.Date = tempDate;
             StockObj.Open = tempOpenPrice;
 
-            return "The price for " + tickerSymbol + " is " + tempOpenPrice;
+            return "The price for " + tempTickerSymbol + " is " + tempOpenPrice;
 
         }
 
@@ -121,21 +125,22 @@ namespace StockTicker.Pages
 
         public IActionResult OnPostAjaxGameStart(string val)
         {
+            
             //Call api and assign response to Stock Object with selected ticker and date
             tempDate = RandomDay();
             var dateTest = tempDate.ToString("yyyy-MM-dd");
             apiCall = new ApiClass(val, dateTest);
-            tickerSymbol = apiCall.stock_.Symbol.ToString();
+            tempTickerSymbol = apiCall.stock_.Symbol.ToString();
             tempOpenPrice = apiCall.stock_.Open;
             tempOpenPrice = Math.Truncate(tempOpenPrice * 100) / 100;
 
-            //before method ends save all important data
+            //load all important data into stock model so we can have persistent data
             StockObj.Open = tempOpenPrice;
             StockObj.Date = tempDate;
-            StockObj.Balance = 10000.00;
-            StockObj.Symbol = tickerSymbol;
+            StockObj.Balance = 10000.00;//initialze bank account with ten thousand dollars
+            StockObj.Symbol = tempTickerSymbol;
 
-            return new JsonResult($"The price for {tickerSymbol} is ${tempOpenPrice}: \n\r");
+            return new JsonResult($"The price for {tempTickerSymbol} is ${tempOpenPrice}: \n\r");
         }
 
 
@@ -179,8 +184,6 @@ namespace StockTicker.Pages
         public IActionResult OnPostAjaxHold()
         {
             //do nothing and progress the game
-
-
 
             return new JsonResult("You decided to hold. " + " \n\r" + ProgressGameplay());
         }
