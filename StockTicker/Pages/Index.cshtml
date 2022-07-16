@@ -83,6 +83,10 @@
 
 @section Scripts
 {
+    <script>
+        var test = "";
+    </script>
+
 
     <script src="https://cdn.plot.ly/plotly-2.12.1.min.js"></script>
     <script src="plotly-2.12.1.min.js"></script>
@@ -154,7 +158,7 @@
     
 <!--Start Game-->
     <script type="text/javascript">
-        
+
         //initialize the game
         $("#startButton").click(function() {
             var e = document.getElementById("stockSymbol");
@@ -206,7 +210,7 @@
             }
             else if(document.getElementById('sellButton').checked)//sell: pass in amount of stock to sell
             {
-               /* $.ajax({
+                $.ajax({
                     type: "POST",
                     url: "/Index?handler=AjaxSell",
                     data: { "val": amount },
@@ -220,14 +224,14 @@
                     
                         document.getElementById("stockInfo").innerHTML = message;
                     }
-                });*/
+                });
             }
             else if(document.getElementById('holdButton').checked)//hold 
             {
-                /*$.ajax({
+                $.ajax({
                     type: "POST",
                     url: "/Index?handler=AjaxHold",
-                    data: {  },
+                    data: {},
                     contentType: 'application/x-www-form-urlencoded',
                     dataType: "json",
                     headers:
@@ -235,15 +239,15 @@
                         "RequestVerificationToken": $('input:hidden[name="__RequestVerificationToken"]').val()
                     },
                     success: function(message) {
-                    
+
                         document.getElementById("stockInfo").innerHTML = message;
                     }
-                });*/
+                });
             }
             
         });
     </script>
-@*
+
     <!--Quit Button-->
     <script type="text/javascript">
         //function to quit game
@@ -258,11 +262,12 @@
                 {
                     "RequestVerificationToken": $('input:hidden[name="__RequestVerificationToken"]').val()
                 },
-                success: function() {
-                    
+                success: function(message) {
+                    document.getElementById("stockInfo").innerHTML = message;
+
                 }
             });
         });
                
-    </script>*@
+    </script>
 }

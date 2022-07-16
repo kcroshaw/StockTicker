@@ -19,17 +19,17 @@ namespace StockTicker.Pages
 
         public ApiClass apiCall;
 
-        static DateTime startDate = new DateTime();
+        public DateTime startDate ;
 
         public List<string> listOfStrings = new List<string>();
 
-        static string test;
+        public string test;
 
-        static double OpenPrice = 0.0;
+        public double OpenPrice = 0.0;
+        
+        public double Balance = 10000.00;
 
-        static double Balance = 10000.00;
-
-        static int StockOwned = 0;
+        public int StockOwned = 0;
 
         public IndexModel(ILogger<IndexModel> logger)
         {
@@ -99,7 +99,7 @@ namespace StockTicker.Pages
             Balance += amount;
 
             //TODO: show ending results by returning a string to the Ajax handler
-            return "PLACEHOLDER";
+            return "Game Over! You ended with $" + Balance + "\n\r" + "That means your overall gain/loss was $" + (Balance-10000);
         }
 
         //************Ajax functions**********************
@@ -130,8 +130,7 @@ namespace StockTicker.Pages
             //do stock and money algorithm
             Balance -= cost;
             StockOwned += buyAmount;
-
-            //return new JsonResult("You bought " + val + " shares and spent  $" + cost +" \n\r"+ ProgressGameplay());
+                       
             return new JsonResult("You bought " + val + " shares and spent  $" + cost + " \n\r" + ProgressGameplay());
         }
 
