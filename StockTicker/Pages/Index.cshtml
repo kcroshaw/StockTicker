@@ -73,9 +73,9 @@
         
             @Html.AntiForgeryToken()
             <input type="button" id="acceptButton" value="Accept" /><br /><br />
-            @Html.AntiForgeryToken()
-            <input type="button" id="quitButton" value="Quit" />
         </form>
+        @Html.AntiForgeryToken()
+        <input type="button" id="quitButton" value="Quit" />
 
 </div>
 
@@ -183,9 +183,9 @@
         //function to handle accept button (buy/sell/hold)
         $("#acceptButton").click(function() {
 
-            var e = document.getElementById("buySellInput");
-            var amount = e.value;
+            var amount = document.getElementById("demo").innerHTML;
             
+
             if(document.getElementById('buyButton').checked)//buy: pass in amount of stock to buy
             {
                 $.ajax({
@@ -206,7 +206,7 @@
             }
             else if(document.getElementById('sellButton').checked)//sell: pass in amount of stock to sell
             {
-                $.ajax({
+               /* $.ajax({
                     type: "POST",
                     url: "/Index?handler=AjaxSell",
                     data: { "val": amount },
@@ -220,11 +220,11 @@
                     
                         document.getElementById("stockInfo").innerHTML = message;
                     }
-                });
+                });*/
             }
             else if(document.getElementById('holdButton').checked)//hold 
             {
-                $.ajax({
+                /*$.ajax({
                     type: "POST",
                     url: "/Index?handler=AjaxHold",
                     data: {  },
@@ -238,9 +238,9 @@
                     
                         document.getElementById("stockInfo").innerHTML = message;
                     }
-                });
+                });*/
             }
-            else { break; }
+            
         });
     </script>
 @*

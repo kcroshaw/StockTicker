@@ -11,29 +11,31 @@ using StockTicker.Services;
 
 namespace StockTicker.Pages
 {
+
+
     public class IndexModel : PageModel
     {
         private readonly ILogger<IndexModel> _logger;
+
+        public ApiClass apiCall;
+
+        static DateTime startDate = new DateTime();
+
+        public List<string> listOfStrings = new List<string>();
+
+        static string test;
+
+        static double OpenPrice = 0.0;
+
+        static double Balance = 10000.00;
+
+        static int StockOwned = 0;
 
         public IndexModel(ILogger<IndexModel> logger)
         {
             _logger = logger;
         }
-        
-
-        public ApiClass apiCall;
-
-        private DateTime startDate;
-
-        public List<string> listOfStrings = new List<string>();
-
-        public string test;
-
-        public double OpenPrice;
-
-        public double Balance = 10000.00;
-
-        public int StockOwned = 0;
+  
 
         public IActionResult OnGet()
         {
@@ -130,7 +132,7 @@ namespace StockTicker.Pages
             StockOwned += buyAmount;
 
             //return new JsonResult("You bought " + val + " shares and spent  $" + cost +" \n\r"+ ProgressGameplay());
-            return new JsonResult("You bought " + val + " shares and spent  $" + cost + " \n\r");
+            return new JsonResult("You bought " + val + " shares and spent  $" + cost + " \n\r" + ProgressGameplay());
         }
 
         public IActionResult OnPostAjaxSell(string val)
