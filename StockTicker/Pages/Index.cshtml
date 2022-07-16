@@ -48,11 +48,11 @@
         <table class="account-info">
             <tr>
                 <th class="account-info">Bank Account:</th>
-                <td class="account-info">$@Model.Balance</td>
+                <td class="account-info">$@Model.tempBalance</td>
             </tr>
             <tr>
                 <th class="account-info">Owned Stock:</th>
-                <td class="account-info">@Model.StockOwned</td>
+                <td class="account-info">@Model.tempStockOwned</td>
             </tr>
         </table>
         <br/>
@@ -67,7 +67,7 @@
             <input type="text" id="buySellInput" style="visibility:hidden" onkeyup="updateSlider(document.getElementById('buySellInput').value)" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" /><br /><br />
             <center>
                 <div class="slidecontainer" id="slider" style="visibility:hidden">
-                    <input type="range" min="0" max="@Model.Balance" value="1" class="slider" id="myRange">
+                    <input type="range" min="0" max="@Model.tempBalance" value="1" class="slider" id="myRange">
                     <p>Amount: <span id="demo"></span></p>
                 </div>
             </center>
@@ -97,7 +97,7 @@
         var data = [
             {
                 x: ['Bank Account', 'Stocks'],
-                y: [@Model.Balance, @Model.StockOwned],
+                y: [@Model.tempBalance, @Model.tempStockOwned],
                 type: 'bar'
             }
         ];

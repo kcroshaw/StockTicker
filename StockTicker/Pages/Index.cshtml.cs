@@ -21,30 +21,37 @@ namespace StockTicker.Pages
 
         public List<string> listOfStrings = new List<string>();
 
-        public string tickerSymbol;
-        
-        //DONT USE THESE TO STORE DATA - only use as temp vars if necessary
+
+        //DONT USE THESE TO STORE PERSISTENT DATA - only use as temp vars if necessary
+        public string tickerSymbol = "";
+
         public DateTime tempDate;
 
         public double tempOpenPrice = 0.0;
         
-        public double tempBalance = 10000.00;
+        public double tempBalance = 0.00;
         
         public int tempStockOwned = 0;
         //******************************************************************
-
-        Stock _stockObj = new Stock();
         
         public IndexModel(ILogger<IndexModel> logger)
         {
             _logger = logger;
         }
   
+        public Stock StockObj { get; set; }
 
         public IActionResult OnGet()
         {
             if (User.Identity.IsAuthenticated)
             {
+                //set temp vars equal to their respective data members in the stock model
+                tickerSymbol = StockObj.Symbol;
+                tempDate = StockObj.Date;
+                tempOpenPrice = StockObj.Open;
+                tempBalance = StockObj.Balance;
+                tempStockOwned = StockObj.StockOwned;               
+                
                 return Page();
             }
             else
@@ -59,7 +66,7 @@ namespace StockTicker.Pages
         //this function should be used to update the data shown on the charts 
         public string ProgressGameplay()
         {
-            tempDate = NextDay(_stockObj.Date);
+            tempDate = NextDay(StockObj.Date);
             //check if the day is today or in the future, if so we need to quit or it will break
             if (tempDate >= DateTime.Now)
             {
@@ -67,14 +74,14 @@ namespace StockTicker.Pages
             }
             var dateTest = tempDate.ToString("yyyy-MM-dd");
             //progress the game state
-            apiCall = new ApiClass(_stockObj.Symbol, dateTest);
+            apiCall = new ApiClass(StockObj.Symbol, dateTest);
             tickerSymbol = apiCall.stock_.Symbol.ToString();
             tempOpenPrice = apiCall.stock_.Open;
             tempOpenPrice = Math.Truncate(tempOpenPrice * 100) / 100;
 
             //before this method ends we need to save the variables
-            _stockObj.Date = tempDate;
-            _stockObj.Open = tempOpenPrice;
+            StockObj.Date = tempDate;
+            StockObj.Open = tempOpenPrice;
 
             return "The price for " + tickerSymbol + " is " + tempOpenPrice;
 
@@ -103,11 +110,11 @@ namespace StockTicker.Pages
         public string QuitGame()
         {
             //sell all stock the user has and add the money to bank account
-            double amount = _stockObj.StockOwned * _stockObj.Open;
-            _stockObj.Balance += amount;
+            double amount = StockObj.StockOwned * StockObj.Open;
+            StockObj.Balance += amount;
 
-            //TODO: show ending results by returning a string to the Ajax handler
-            return "Game Over! You ended with $" + _stockObj.Balance + "\n\r" + "That means your overall gain/loss was $" + (_stockObj.Balance-10000);
+            //show ending results by returning a string to the Ajax handler
+            return "Game Over! You ended with $" + StockObj.Balance + "\n\r" + "That means your overall gain/loss was $" + (StockObj.Balance-10000);
         }
 
         //************Ajax functions**********************
@@ -123,28 +130,30 @@ namespace StockTicker.Pages
             tempOpenPrice = Math.Truncate(tempOpenPrice * 100) / 100;
 
             //before method ends save all important data
-            _stockObj.Open = tempOpenPrice;
-            _stockObj.Date = tempDate;
-            _stockObj.Balance = 100000.00;
-            _stockObj.Symbol = tickerSymbol;
+            StockObj.Open = tempOpenPrice;
+            StockObj.Date = tempDate;
+            StockObj.Balance = 10000.00;
+            StockObj.Symbol = tickerSymbol;
 
-            return new JsonResult($"The price for {tickerSymbol} is ${tempOpenPrice} - ");
+            return new JsonResult($"The price for {tickerSymbol} is ${tempOpenPrice}: \n\r");
         }
 
 
         public IActionResult OnPostAjaxBuy(string val)
         {
             int buyAmount = Convert.ToInt32(val);
-            double cost = _stockObj.Open * buyAmount;
+
+            //do stock and money algorithm
+            double cost = StockObj.Open * buyAmount;
             //check to see if we have enough money
-            if (cost > _stockObj.Balance)
+            if (cost > StockObj.Balance)
             {
                 return new JsonResult("You do not have enough money to buy " + val + " shares.");
             }
             
-            //do stock and money algorithm
-            _stockObj.Balance -= cost;
-            _stockObj.StockOwned += buyAmount;
+            //save data
+            StockObj.Balance -= cost;
+            StockObj.StockOwned += buyAmount;
                        
             return new JsonResult("You bought " + val + " shares and spent  $" + cost + " \n\r" + ProgressGameplay());
         }
@@ -154,15 +163,15 @@ namespace StockTicker.Pages
             int sellAmount = Convert.ToInt32(val);
 
             //check to see if we even have enough stock to sell
-            if (sellAmount > _stockObj.StockOwned)
+            if (sellAmount > StockObj.StockOwned)
             {
                 return new JsonResult("You do not have enough stock to sell " + val + " shares.");
             }
             
             //do stock and money algorithm
-            double money = _stockObj.Open * sellAmount;
-            _stockObj.Balance += money;
-            _stockObj.StockOwned -= sellAmount;
+            double money = StockObj.Open * sellAmount;
+            StockObj.Balance += money;
+            StockObj.StockOwned -= sellAmount;
 
             return new JsonResult("You sold " + val + " shares and made $" + money + " \n\r" + ProgressGameplay());
         }
