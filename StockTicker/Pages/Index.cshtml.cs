@@ -67,7 +67,7 @@ namespace StockTicker.Pages
             }
             var dateTest = tempDate.ToString("yyyy-MM-dd");
             //progress the game state
-            apiCall = new ApiClass(tickerSymbol, dateTest);
+            apiCall = new ApiClass(_stockObj.Symbol, dateTest);
             tickerSymbol = apiCall.stock_.Symbol.ToString();
             tempOpenPrice = apiCall.stock_.Open;
             tempOpenPrice = Math.Truncate(tempOpenPrice * 100) / 100;
@@ -76,7 +76,7 @@ namespace StockTicker.Pages
             _stockObj.Date = tempDate;
             _stockObj.Open = tempOpenPrice;
 
-            return "The price for {test} is ${OpenPrice}";
+            return "The price for " + tickerSymbol + " is " + tempOpenPrice;
 
         }
 
@@ -126,6 +126,7 @@ namespace StockTicker.Pages
             _stockObj.Open = tempOpenPrice;
             _stockObj.Date = tempDate;
             _stockObj.Balance = 100000.00;
+            _stockObj.Symbol = tickerSymbol;
 
             return new JsonResult($"The price for {tickerSymbol} is ${tempOpenPrice} - ");
         }
