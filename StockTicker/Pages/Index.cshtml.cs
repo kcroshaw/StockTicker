@@ -19,18 +19,22 @@ namespace StockTicker.Pages
 
         public ApiClass apiCall;
 
-        public DateTime startDate ;
-
         public List<string> listOfStrings = new List<string>();
 
         public string test;
-
-        public double OpenPrice = 0.0;
         
-        public double Balance = 10000.00;
+        //DONT USE THESE TO STORE DATA - only use as temp vars if necessary
+        public DateTime tempDate;
 
-        public int StockOwned = 0;
+        public double tempOpenPrice = 0.0;
+        
+        public double tempBalance = 10000.00;
+        
+        public int tempStockOwned = 0;
+        //******************************************************************
 
+        Stock _stockObj = new Stock();
+        
         public IndexModel(ILogger<IndexModel> logger)
         {
             _logger = logger;
@@ -55,19 +59,23 @@ namespace StockTicker.Pages
         //this function should be used to update the data shown on the charts 
         public string ProgressGameplay()
         {
-            startDate = NextDay(startDate);
+            tempDate = NextDay(_stockObj.Date);
             //check if the day is today or in the future, if so we need to quit or it will break
-            if (startDate >= DateTime.Now)
+            if (tempDate >= DateTime.Now)
             {
                 return QuitGame();
             }
-            var dateTest = startDate.ToString("yyyy-MM-dd");
+            var dateTest = tempDate.ToString("yyyy-MM-dd");
             //progress the game state
             apiCall = new ApiClass(test, dateTest);
             test = apiCall.stock_.Symbol.ToString();
-            OpenPrice = apiCall.stock_.Open;
-            OpenPrice = Math.Truncate(OpenPrice * 100) / 100;
-            
+            tempOpenPrice = apiCall.stock_.Open;
+            tempOpenPrice = Math.Truncate(tempOpenPrice * 100) / 100;
+
+            //before this method ends we need to save the variables
+            _stockObj.Date = tempDate;
+            _stockObj.Open = tempOpenPrice;
+
             return "The price for {test} is ${OpenPrice}";
 
         }
@@ -95,11 +103,11 @@ namespace StockTicker.Pages
         public string QuitGame()
         {
             //sell all stock the user has and add the money to bank account
-            double amount = StockOwned * OpenPrice;
-            Balance += amount;
+            double amount = _stockObj.StockOwned * _stockObj.Open;
+            _stockObj.Balance += amount;
 
             //TODO: show ending results by returning a string to the Ajax handler
-            return "Game Over! You ended with $" + Balance + "\n\r" + "That means your overall gain/loss was $" + (Balance-10000);
+            return "Game Over! You ended with $" + _stockObj.Balance + "\n\r" + "That means your overall gain/loss was $" + (_stockObj.Balance-10000);
         }
 
         //************Ajax functions**********************
@@ -107,29 +115,35 @@ namespace StockTicker.Pages
         public IActionResult OnPostAjaxGameStart(string val)
         {
             //Call api and assign response to Stock Object with selected ticker and date
-            startDate = RandomDay();
-            var dateTest = startDate.ToString("yyyy-MM-dd");
+            tempDate = RandomDay();
+            var dateTest = tempDate.ToString("yyyy-MM-dd");
             apiCall = new ApiClass(val, dateTest);
             test = apiCall.stock_.Symbol.ToString();
-            OpenPrice = apiCall.stock_.Open;
-            OpenPrice = Math.Truncate(OpenPrice * 100) / 100;
-            return new JsonResult($"The price for {test} is ${OpenPrice} - ");
+            tempOpenPrice = apiCall.stock_.Open;
+            tempOpenPrice = Math.Truncate(tempOpenPrice * 100) / 100;
+
+            //before method ends save all important data
+            _stockObj.Open = tempOpenPrice;
+            _stockObj.Date = tempDate;
+            _stockObj.Balance = 100000.00;
+
+            return new JsonResult($"The price for {test} is ${tempOpenPrice} - ");
         }
 
 
         public IActionResult OnPostAjaxBuy(string val)
         {
             int buyAmount = Convert.ToInt32(val);
-            double cost = OpenPrice * buyAmount;
+            double cost = _stockObj.Open * buyAmount;
             //check to see if we have enough money
-            if (cost > Balance)
+            if (cost > _stockObj.Balance)
             {
                 return new JsonResult("You do not have enough money to buy " + val + " shares.");
             }
             
             //do stock and money algorithm
-            Balance -= cost;
-            StockOwned += buyAmount;
+            _stockObj.Balance -= cost;
+            _stockObj.StockOwned += buyAmount;
                        
             return new JsonResult("You bought " + val + " shares and spent  $" + cost + " \n\r" + ProgressGameplay());
         }
@@ -139,15 +153,15 @@ namespace StockTicker.Pages
             int sellAmount = Convert.ToInt32(val);
 
             //check to see if we even have enough stock to sell
-            if (sellAmount > StockOwned)
+            if (sellAmount > _stockObj.StockOwned)
             {
                 return new JsonResult("You do not have enough stock to sell " + val + " shares.");
             }
             
             //do stock and money algorithm
-            double money = OpenPrice * sellAmount;
-            Balance += money;
-            StockOwned -= sellAmount;
+            double money = _stockObj.Open * sellAmount;
+            _stockObj.Balance += money;
+            _stockObj.StockOwned -= sellAmount;
 
             return new JsonResult("You sold " + val + " shares and made $" + money + " \n\r" + ProgressGameplay());
         }
