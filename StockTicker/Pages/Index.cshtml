@@ -1,4 +1,5 @@
-﻿@page  
+﻿@page
+
 @using StockTicker.Models
 @model IndexModel
 @{
@@ -8,42 +9,46 @@
 
 <!DOCTYPE html>
 <html>
+<head>
+    <script src="lib/draggable-piechart/draggable-piechart.js"></script>
+</head>
 
-<h1 class="display-4 text-center"><u>Stock Ticker Game</u></h1>
+<body>
 
-<!--Show this at page start then after information is submitted save the data and hide this div-->
-<div id="startArea" class="text-center" runat="server">
-    <form method="post">
-        <span>Please Enter a Stock Symbol To Begin Game:</span>
+    <h1 class="display-4 text-center"><u>Stock Ticker Game</u></h1>
 
-        <select id="stockSymbol" name="stockSymbol">
-               <option value="AAPL">AAPL - (apple)</option>
-               <option value="MSFT">MSFT - (microsoft)</option>
-               <option value="AMZN">AMZN - (amazon)</option>
-               <option value="TSLA">TSLA - (tesla)</option>
-               <option value="SCKT">SCKT - (socket)</option>
-               <option value="GME">GME - (gamestop)</option>
-        </select>
-        
-        <br />
-        @Html.AntiForgeryToken()
-        <input type="button" id="startButton" value="Start" onclick="toggleDiv('startArea')"/>
+    <!--Show this at page start then after information is submitted save the data and hide this div-->
+    <div id="startArea" class="text-center" runat="server">
+        <form method="post">
+            <span>Please Enter a Stock Symbol To Begin Game:</span>
 
-    </form>
-</div>
+            <select id="stockSymbol" name="stockSymbol">
+                <option value="AAPL">AAPL - (apple)</option>
+                <option value="MSFT">MSFT - (microsoft)</option>
+                <option value="AMZN">AMZN - (amazon)</option>
+                <option value="TSLA">TSLA - (tesla)</option>
+                <option value="SCKT">SCKT - (socket)</option>
+                <option value="GME">GME - (gamestop)</option>
+            </select>
+
+            <br />
+            @Html.AntiForgeryToken()
+            <input type="button" id="startButton" value="Start" onclick="toggleDiv('startArea')" />
+        </form>
+    </div>
 
 
-<!--after above info is submitted and saved to DB unhide this div-->
-<div id="gameArea" class="text-center" style="visibility:hidden" runat="server">
+    <!--after above info is submitted and saved to DB unhide this div-->
+    <div id="gameArea" class="text-center" style="visibility:hidden" runat="server">
 
-    <!--Show graph here-->
-    <div id="graph">
-    <center>
-        <div id="tester" style="width:600px;height:250px;"></div>
-    </center>
-    </div><br/>
+        <!--Show graph here-->
+        <div id="graph">
+            <center>
+                <canvas id="piechart" width="300" height="300"></canvas>
+            </center>
+        </div><br />
 
-    <!--users bank account-->
+        <!--users bank account-->
 
         <table class="account-info">
             <tr>
@@ -52,11 +57,11 @@
             </tr>
             <tr>
                 <th class="account-info">Owned Stock:</th>
-                <td class="account-info"  id="stockOwn">@Model.StockOwned</td>
+                <td class="account-info" id="stockOwn">@Model.StockOwned</td>
             </tr>
         </table>
-        <br/>
-    
+        <br />
+
         <form id="menu" method="post">
             <!--buttons for buy or sell-->
             <div id="stockInfo"></div>
@@ -68,11 +73,13 @@
             <input type="text" id="buySellInput" style="visibility:hidden" onkeyup="updateSlider(document.getElementById('buySellInput').value)" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" /><br /><br />
             <center>
                 <div class="slidecontainer" id="slider" style="visibility:hidden">
-                    <input type="range" min="0" max="@Model.Balance" value="1" class="slider" id="myRange">
-                    <p>Amount: <span id="demo"></span></p>
+                    
+                    <input type="range" id="myRange" class="slider" value="0">
+                    <p>Amount of Stock: <span id="demo"></span></p>
+                    <p>Amount in Dollars: <span id="stockInDollars"></span></p>
                 </div>
             </center>
-        
+
             @Html.AntiForgeryToken()
             <p style="visibility:hidden" id="notEgn">Not Enough stock avalible to sell ! </p><br />
             <input type="button" id="acceptButton" value="Accept" /><br />
@@ -81,47 +88,84 @@
             <input type="button" id="quitButton" value="Quit" />
         </form>
 
-</div>
+    </div>
+</body>
 
 </html>
 
 @section Scripts
 {
+    <script src="/lib/draggable-piechart/draggable-piechart.js"></script>
+    <script src="/lib/draggable-piechart/draggable-piechart-jquery.js"></script>
 
-    <script src="https://cdn.plot.ly/plotly-2.12.1.min.js"></script>
-    <script src="plotly-2.12.1.min.js"></script>
-
-<!--load account info-->
-    <script> 
-        var data = [
-            {
-                x: ['Bank Account', 'Stocks'],
-                y: [@Model.Balance, @Model.StockOwned],
-                type: 'bar'
-            }
-        ];
-
-        Plotly.newPlot('tester', data);
+<!--Get data when something changes on pie chart-->
+    <script>
+        function onPieChartChange(piechart) {
+            // get the percentage for the first slice
+            var pieBankB = piechart.getSliceSizePercentage(0);
+            var pieStockB = piechart.getSliceSizePercentage(1);
+            // get all percentages
+            var percentages = piechart.getAllSliceSizePercentages();
+        }
     </script>
 
-<!--show BuySell input-->
-    <script type="text/javascript">
-        function showBuySellInput() {
-            var hold = document.getElementById("holdButton");
+    <!--show pie chart-->
+    <script>
+        var balance = @Model.Balance;
+        var stocks = @Model.StockOwned;
+        var total = balance + stocks;
+
+        var proportions = [
+            { proportion: 99.99, format: { color: "#a5d6c3", label: 'Account Balance' } },
+            { proportion: 0.01, format: { color: "#a8c8ed", label: 'Stocks' } }];
+
+        var newPie = new DraggablePiechart({
+            canvas: document.getElementById('piechart'),
+            proportions: proportions,
+            collapsing: false,
+            minAngle: 0.1,
+            onchange: onPieChartChange
+        });
+    </script>
+
+    <!--show BuySell input-->
+    <script type="text/javascript">function showBuySellInput() {
+    var hold = document.getElementById("holdButton");
+    var sell = document.getElementById("sellButton");
+    var buy = document.getElementById("buyButton");
+
+    var bank_v = parseFloat(document.querySelector("#bankTotal").textContent.split('$')[1]);
+    var stock_v = parseFloat(document.querySelector("#stockOwn").textContent);
+    var cost_v = parseFloat(document.querySelector("#stockInfo").textContent.split('$')[1]);
+    var buySellInput = document.querySelector("#buySellInput");
+
             if (hold.checked) {
                 document.getElementById("buySellInput").style.visibility = 'hidden';
                 document.getElementById("slider").style.visibility = 'hidden';
             }
+            else if (sell.checked) {
+                document.getElementById("buySellInput").style.visibility = 'visible';
+                document.getElementById("slider").style.visibility = 'visible';
+                document.getElementById("myRange").max = stock_v * cost_v;
+                document.getElementById("myRange").value = 0;
+                buySellInput.value = 0;
+                document.querySelector("#myRange").value = 0;
+                document.querySelector("#demo").textContent = 0;
+                document.querySelector("#stockInDollars").textContent = 0;
+            }
             else {
                 document.getElementById("buySellInput").style.visibility = 'visible';
                 document.getElementById("slider").style.visibility = 'visible';
+                document.getElementById("myRange").max = bank_v;
+                document.getElementById("myRange").value = 0;
+                buySellInput.value = 0;
+                document.querySelector("#myRange").value = 0;
+                document.querySelector("#demo").textContent = 0;
+                document.querySelector("#stockInDollars").textContent = 0;
             }
-        }
-    </script>
-<!--Toggle div-->
-    <script type="text/javascript">
-
-        //function to hide/show divs on start button click
+        }</script>
+    <!--Toggle div-->
+    <script type="text/javascript">//function to hide/show divs on start button click
         function toggleDiv(id) {
             var div = document.getElementById(id);
             div.style.display = "none";
@@ -129,20 +173,16 @@
             div.style.visibility = "visible";
             //document.querySelector("#myRange").max = (10000/v parseFloat(document.querySelector("#stockInfo").textContent.split('$')[1]);)
 
-        };
-    </script>
+        };</script>
 
-<!--update slider amount-->
-    <script>
-        function updateSlider(amount) {
+    <!--update slider amount-->
+    <script>function updateSlider(amount) {
             document.getElementById("myRange").value = amount;
             document.getElementById("demo").innerHTML = amount;
-        };
-     </script>
+        };</script>
 
-<!--Slider stuff-->
+    <!--Slider stuff-->
     <script type="text/javascript">
-        
         var slider = document.getElementById("myRange");
         var output = document.getElementById("demo");
         var amountToBuySellText = document.getElementById("buySellInput");
@@ -150,18 +190,16 @@
         output.innerHTML = slider.value;
 
         slider.oninput = function () {
-            output.innerHTML = this.value;
+            var cost_v = parseFloat(document.querySelector("#stockInfo").textContent.split('$')[1]);
+            document.getElementById("stockInDollars").innerHTML = this.value;
+            output.innerHTML = (this.value / cost_v).toFixed(2);
             amountToBuySellText.value = this.value;
-        }
-    </script>
-    
-<!--Ajax Scripts-->
-    
-<!--Start Game-->
-    <script type="text/javascript">
-        
-        //initialize the game
-        $("#startButton").click(function() {
+        }</script>
+
+    <!--Ajax Scripts-->
+    <!--Start Game-->
+    <script type="text/javascript">//initialize the game
+        $("#startButton").click(function () {
             var e = document.getElementById("stockSymbol");
             var strUser = e.value;
             $.ajax({
@@ -174,7 +212,7 @@
                 {
                     "RequestVerificationToken": $('input:hidden[name="__RequestVerificationToken"]').val()
                 },
-                success: function(message) {
+                success: function (message) {
                     document.getElementById("stockInfo").innerHTML = message;
                     document.getElementById("stockInfoHID").innerHTML = message;
 
@@ -185,129 +223,148 @@
                     document.getElementById("stockInfo").textContent = mes_1;
                     document.getElementById("stockInfoHID").textContent = mes_2;
                     //document.getElementById("stockInfoHID").style.visibility = 'Hidden';
+                    var bank_v = parseFloat(document.querySelector("#bankTotal").textContent.split('$')[1]);
+                    document.getElementById("myRange").max = bank_v;
                 }
             });
-        });
-    </script>
-    
-<!--Accept Button-->
-    <script type="text/javascript">   
-        
-        function updatedApi() {
+        });</script>
 
-    document.getElementById("notOpt").style.visibility = "hidden";
-    document.getElementById("notEgn").style.visibility = "hidden";
+    <!--Accept Button-->
+    <script type="text/javascript">function updatedApi() {
+
+            document.getElementById("notOpt").style.visibility = "hidden";
+            document.getElementById("notEgn").style.visibility = "hidden";
 
 
-    var e = document.getElementById("stockSymbol");
-    var strUser = e.value;
+            var e = document.getElementById("stockSymbol");
+            var strUser = e.value;
 
-    e = document.getElementById("stockInfoHID");
-    var strDate = e.textContent;
+            e = document.getElementById("stockInfoHID");
+            var strDate = e.textContent;
 
 
-    $.ajax({
-        type: "POST",
-        url: "/Index?handler=AjaxBuy",
-        data: { "val": strUser, "valTwo": strDate },
-        contentType: 'application/x-www-form-urlencoded',
-        dataType: "json",
-        headers:
-        {
-            "RequestVerificationToken": $('input:hidden[name="__RequestVerificationToken"]').val()
-        },
-        success: function(message) {
-            document.getElementById("stockInfo").innerHTML = message;
-            document.getElementById("stockInfoHID").innerHTML = message;
-
-            var mes = document.getElementById("stockInfo").textContent;
-            var mes_1 = mes.split("-")[0];
-            var mes_2 = mes.split("-")[1];
-
-            document.getElementById("stockInfo").textContent = mes_1;
-            document.getElementById("stockInfoHID").textContent = mes_2;
-            //document.getElementById("stockInfoHID").style.visibility = 'Hidden';
-        }
-    });
-}
-        
-        //function to handle accept button (buy/sell/hold)
-$("#acceptButton").click(function() {
-
-    var buySellInput_v = parseFloat(document.querySelector("#buySellInput").value);
-    var bank_v = parseFloat(document.querySelector("#bankTotal").textContent.split('$')[1]);
-    var stock_v = parseFloat(document.querySelector("#stockOwn").textContent);
-    var cost_v = parseFloat(document.querySelector("#stockInfo").textContent.split('$')[1]);
-
-    var buySellInput = document.querySelector("#buySellInput");
-    var bank = document.querySelector("#bankTotal");
-    var stock = document.querySelector("#stockOwn");
-
-    
-    if (document.getElementById('buyButton').checked) {
-
-        stock_v = stock_v + buySellInput_v;
-
-        bank_v = bank_v - (buySellInput_v * cost_v)
-
-        buySellInput.value = stock_v.toString();
-        document.querySelector("#myRange").value =  stock_v;
-        document.querySelector("#demo").textContent = stock_v.toString();
-        bank.textContent = '$' + bank_v.toFixed(2);
-        stock.textContent = stock_v.toString();
-
-        updatedApi();
-    }
-    else if (document.getElementById('sellButton').checked) {
-
-        if (stock_v < buySellInput_v) {
-            document.getElementById("notEgn").style.visibility = "visible";
-        }
-        else { 
-        stock_v = stock_v - buySellInput_v;
-
-        bank_v = bank_v + (buySellInput_v * cost_v)
-
-        buySellInput.value = stock_v.toString();
-        document.querySelector("#myRange").value =  stock_v;
-        document.querySelector("#demo").textContent = stock_v.toString();
-        bank.textContent = '$' + bank_v.toFixed(2);
-        stock.textContent = stock_v.toString();
-
-        updatedApi();
-    }
-}
-    else if (document.getElementById('holdButton').checked) { 
-
-    updatedApi();
-}
-    else { 
-
-        document.getElementById("notOpt").style.visibility = "visible";
-    }
-});
-    </script>
-      
-@*
-    <!--Quit Button-->
-    <script type="text/javascript">
-        //function to quit game
-        $("#quitButton").click(function(message) {
             $.ajax({
                 type: "POST",
-                url: "/Index?handler=AjaxQuit",
-                data: {  },
+                url: "/Index?handler=AjaxBuy",
+                data: { "val": strUser, "valTwo": strDate },
                 contentType: 'application/x-www-form-urlencoded',
                 dataType: "json",
                 headers:
                 {
                     "RequestVerificationToken": $('input:hidden[name="__RequestVerificationToken"]').val()
                 },
-                success: function() {
-                    
+                success: function (message) {
+                    document.getElementById("stockInfo").innerHTML = message;
+                    document.getElementById("stockInfoHID").innerHTML = message;
+
+                    var mes = document.getElementById("stockInfo").textContent;
+                    var mes_1 = mes.split("-")[0];
+                    var mes_2 = mes.split("-")[1];
+
+                    document.getElementById("stockInfo").textContent = mes_1;
+                    document.getElementById("stockInfoHID").textContent = mes_2;
+                    //document.getElementById("stockInfoHID").style.visibility = 'Hidden';
+                    var bank_v = parseFloat(document.querySelector("#bankTotal").textContent.split('$')[1]);
+                    document.getElementById("myRange").max = bank_v;
+
                 }
             });
+        }
+
+        //function to handle accept button (buy/sell/hold)
+        $("#acceptButton").click(function () {
+
+            var buySellInput_v = parseFloat(document.querySelector("#buySellInput").value);
+            var bank_v = parseFloat(document.querySelector("#bankTotal").textContent.split('$')[1]);
+            var stock_v = parseFloat(document.querySelector("#stockOwn").textContent);
+            var cost_v = parseFloat(document.querySelector("#stockInfo").textContent.split('$')[1]);
+            var stock_vInDollars = stock_v * cost_v;
+
+            var buySellInput = document.querySelector("#buySellInput");
+            var bank = document.querySelector("#bankTotal");
+            var stock = document.querySelector("#stockOwn");
+
+
+            if (document.getElementById('buyButton').checked) {
+
+                stock_v = (stock_v + (buySellInput_v /cost_v)).toFixed(2);
+
+                bank_v = bank_v - buySellInput_v;
+
+                buySellInput.value = 0;
+                document.querySelector("#myRange").value = 0;
+                document.querySelector("#demo").textContent = 0;
+                bank.textContent = '$' + bank_v.toFixed(2);
+                stock.textContent = stock_v.toString();
+
+                updatedApi();
+            }
+            else if (document.getElementById('sellButton').checked) {
+
+                stock_v = (stock_v - (buySellInput_v / cost_v)).toFixed(2);
+
+                bank_v = (bank_v + buySellInput).toFixed(2);
+
+                buySellInput.value = 0;
+                document.querySelector("#myRange").value = 0;
+                document.querySelector("#demo").textContent = 0;
+                bank.textContent = '$' + bank_v.toFixed(2);
+                stock.textContent = stock_v.toString();
+
+                updatedApi();
+                
+            }
+            else if (document.getElementById('holdButton').checked) {
+
+                updatedApi();
+            }
+            else {
+
+                document.getElementById("notOpt").style.visibility = "visible";
+            }
+
+            document.getElementById("myRange").max = bank_v;
+
+
+            let canvas = document.getElementById('piechart');
+            let context = canvas.getContext('2d');
+
+            context.clearRect(0, 0, canvas.width, canvas.height);
+
+            var total = bank_v + stock_v;
+
+            var proportions = [
+                { proportion: bank_v / total, format: { color: "#a5d6c3", label: 'Account Balance' } },
+                { proportion: stock_v / total, format: { color: "#a8c8ed", label: 'Stocks' } }];
+
+            var newPie = new DraggablePiechart({
+                canvas: document.getElementById('piechart'),
+                proportions: proportions,
+                onchange: onPieChartChange
+            });
         });
-               
-    </script>*@
+    </script>
+
+    @*
+        <!--Quit Button-->
+        <script type="text/javascript">
+            //function to quit game
+            $("#quitButton").click(function(message) {
+                $.ajax({
+                    type: "POST",
+                    url: "/Index?handler=AjaxQuit",
+                    data: {  },
+                    contentType: 'application/x-www-form-urlencoded',
+                    dataType: "json",
+                    headers:
+                    {
+                        "RequestVerificationToken": $('input:hidden[name="__RequestVerificationToken"]').val()
+                    },
+                    success: function() {
+
+                    }
+                });
+            });
+
+        </script>*@
 }
