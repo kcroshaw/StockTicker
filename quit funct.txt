@@ -1,0 +1,45 @@
+(line 12)	<head>
+    		<script src="lib/draggable-piechart/draggable-piechart.js"></script>
+   		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+		</head>
+		<body style="padding-bottom : 79px">
+			
+		</body>
+
+---------------------------------------------------------------------------------------------------------
+(line 91)	<input type="button" id="quitButton" value="Quit" data-target="#myModal" data-toggle="modal" />
+---------------------------------------------------------------------------------------------------------
+(line 97)	<!-- Modal code for the quit funct-->
+    		<div class="container">
+  			<!-- Modal -->
+  			<div class="modal fade" id="myModal" role="dialog">
+    				<div class="modal-dialog">
+      			<!-- Modal content-->
+      				<div class="modal-content">
+        					<div class="modal-header">
+          						<h4 class="modal-title">Game Results
+          						</h4>
+        					</div>
+        					<div class="modal-body">
+          						<p>You started off with $10,000</p>
+          						<p>You picked <a id="stockNameEnd"></a></p>
+          						<p>After playing the game and a force sellout</p>
+          						<p>Your balance is $<a id="totalEnd"></a></p>
+        					</div>
+        					<div class="modal-footer">
+          						<button class="btn btn-default" onClick="window.location.reload()">Close</button>
+        					</div>
+      				</div>
+    				</div>
+  			</div>
+		</div>
+------------------------------------------------------------------------------------------------------------------------------------------------------
+(line 309)  	    var cost_v = parseFloat(document.querySelector("#stockInfo").textContent.split('$')[1])
+                    var stock_v = parseFloat(document.querySelector("#stockOwn").textContent);
+
+                    document.getElementById("stockNameEnd").textContent = document.getElementById("stockSymbol").value;
+                    var tot = bank_v + (cost_v * stock_v);
+                    document.getElementById("totalEnd").textContent = tot.toFixed(2);
+--------------------------------------------------------------------------------------------------------------------------------------
