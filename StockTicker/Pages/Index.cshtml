@@ -11,9 +11,9 @@
 <html>
 <head>
     <script src="lib/draggable-piechart/draggable-piechart.js"></script>
-   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 </head>
 
 <body style="padding-bottom : 79px">
@@ -47,7 +47,7 @@
         <!--Show graph here-->
         <div id="graph">
             <center>
-                <canvas id="piechart" width="300" height="300"></canvas>
+                <canvas id="piechart" width="400" height="400"></canvas>
             </center>
         </div><br />
 
@@ -76,7 +76,7 @@
             <input type="text" id="buySellInput" style="visibility:hidden" onkeyup="updateSlider(document.getElementById('buySellInput').value)" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" /><br /><br />
             <center>
                 <div class="slidecontainer" id="slider" style="visibility:hidden">
-                    
+
                     <input type="range" id="myRange" class="slider" value="0">
                     <p>Amount of Stock: <span id="demo"></span></p>
                     <p>Amount in Dollars: <span id="stockInDollars"></span></p>
@@ -92,41 +92,36 @@
         </form>
 
     </div>
-
-
     <!--
         Modal code for the quit funct
-
     -->
     <div class="container">
-  <!-- Modal -->
-  <div class="modal fade" id="myModal" role="dialog">
-    <div class="modal-dialog">
-    
-      <!-- Modal content-->
-      <div class="modal-content">
-        <div class="modal-header">
-          <h4 class="modal-title">Game Results
-          </h4>
+        <!-- Modal -->
+        <div class="modal fade" id="myModal" role="dialog">
+            <div class="modal-dialog">
+
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">
+                            Game Results
+                        </h4>
+                    </div>
+                    <div class="modal-body">
+                        <p>You started off with $10,000</p>
+                        <p>You picked <a id="stockNameEnd"></a></p>
+                        <p>After playing the game and a force sellout</p>
+                        <p>Your balance is $<a id="totalEnd"></a></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-default" onClick="window.location.reload()">Close</button>
+                    </div>
+                </div>
+
+            </div>
         </div>
-        <div class="modal-body">
-          <p>You started off with $10,000</p>
-          <p>You picked <a id="stockNameEnd"></a></p>
-          <p>After playing the game and a force sellout</p>
-          <p>Your balance is $<a id="totalEnd"></a></p>
-        </div>
-        <div class="modal-footer">
-          <button class="btn btn-default" onClick="window.location.reload()">Close</button>
-        </div>
-      </div>
-      
+
     </div>
-  </div>
-  
-</div>
-
-
-
 
 </body>
 
@@ -136,24 +131,49 @@
 {
     <script src="/lib/draggable-piechart/draggable-piechart.js"></script>
     <script src="/lib/draggable-piechart/draggable-piechart-jquery.js"></script>
+    <script>
+        var existingBankPct;
+        var existing
+    </script>
 
-<!--Get data when something changes on pie chart-->
+    <!--Get data when something changes on pie chart-->
     <script>
         function onPieChartChange(piechart) {
+            var sell = document.getElementById("sellButton");
+            var buy = document.getElementById("buyButton");
+            var amountToBuySellText = document.getElementById("buySellInput");
+
+            var bank_v = parseFloat(document.querySelector("#bankTotal").textContent.split('$')[1]);
+            var stock_v = parseFloat(document.querySelector("#stockOwn").textContent);
+            var cost_v = parseFloat(document.querySelector("#stockInfo").textContent.split('$')[1]);
+            var stock_vInDollars = stock_v * cost_v;
+            var total = bank_v + stock_vInDollars;
             // get the percentage for the first slice
             var pieBankB = piechart.getSliceSizePercentage(0);
             var pieStockB = piechart.getSliceSizePercentage(1);
-            // get all percentages
-            var percentages = piechart.getAllSliceSizePercentages();
-        }
+
+            var bankFromPct = total * (pieBankB / 100);
+            var stockFromPct = total * (pieStockB / 100);
+
+            document.getElementById("stockInDollars").innerHTML = bankFromPct + " " + bank_v;
+
+            if (bankFromPct < bank_v) {
+                buy.checked = true;
+                amountToBuySellText.value = ((bankFromPct - bank_v) * -1).toFixed(2);
+                updateSlider(((bankFromPct - bank_v) * -1).toFixed(2));
+            }
+            else if (stockFromPct < stock_vInDollars) {
+                sell.checked = true;
+                amountToBuySellText.value = ((stockFromPct - stock_vInDollars) * -1).toFixed(2);
+                updateSlider(((stockFromPct - stock_vInDollars) * -1).toFixed(2));
+            }
+
+            
+}
     </script>
 
     <!--show pie chart-->
     <script>
-        var balance = @Model.Balance;
-        var stocks = @Model.StockOwned;
-        var total = balance + stocks;
-
         var proportions = [
             { proportion: 99.99, format: { color: "#a5d6c3", label: 'Account Balance' } },
             { proportion: 0.01, format: { color: "#a8c8ed", label: 'Stocks' } }];
@@ -162,21 +182,23 @@
             canvas: document.getElementById('piechart'),
             proportions: proportions,
             collapsing: false,
-            minAngle: 0.1,
+            minAngle: 0.0001,
             onchange: onPieChartChange
         });
     </script>
 
+
+
     <!--show BuySell input-->
     <script type="text/javascript">function showBuySellInput() {
-    var hold = document.getElementById("holdButton");
-    var sell = document.getElementById("sellButton");
-    var buy = document.getElementById("buyButton");
+            var hold = document.getElementById("holdButton");
+            var sell = document.getElementById("sellButton");
+            var buy = document.getElementById("buyButton");
 
-    var bank_v = parseFloat(document.querySelector("#bankTotal").textContent.split('$')[1]);
-    var stock_v = parseFloat(document.querySelector("#stockOwn").textContent);
-    var cost_v = parseFloat(document.querySelector("#stockInfo").textContent.split('$')[1]);
-    var buySellInput = document.querySelector("#buySellInput");
+            var bank_v = parseFloat(document.querySelector("#bankTotal").textContent.split('$')[1]);
+            var stock_v = parseFloat(document.querySelector("#stockOwn").textContent);
+            var cost_v = parseFloat(document.querySelector("#stockInfo").textContent.split('$')[1]);
+            var buySellInput = document.querySelector("#buySellInput");
 
             if (hold.checked) {
                 document.getElementById("buySellInput").style.visibility = 'hidden';
@@ -216,23 +238,59 @@
 
     <!--update slider amount-->
     <script>function updateSlider(amount) {
+            var cost_v = parseFloat(document.querySelector("#stockInfo").textContent.split('$')[1]);
             document.getElementById("myRange").value = amount;
-            document.getElementById("demo").innerHTML = amount;
+            document.getElementById("demo").innerHTML = (amount / cost_v).toFixed(2);
+            document.getElementById("stockInDollars").innerHTML = amount;
         };</script>
 
     <!--Slider stuff-->
-    <script type="text/javascript">
-        var slider = document.getElementById("myRange");
-        var output = document.getElementById("demo");
-        var amountToBuySellText = document.getElementById("buySellInput");
-
-        output.innerHTML = slider.value;
+    <script type="text/javascript">var slider = document.getElementById("myRange");
+        
 
         slider.oninput = function () {
+
+            var output = document.getElementById("demo");
+            var amountToBuySellText = document.getElementById("buySellInput");
+
+            var sell = document.getElementById("sellButton");
+            var buy = document.getElementById("buyButton");
+
+            var bank_v = parseFloat(document.querySelector("#bankTotal").textContent.split('$')[1]);
+            var stock_v = parseFloat(document.querySelector("#stockOwn").textContent);
+            var cost_v = parseFloat(document.querySelector("#stockInfo").textContent.split('$')[1]);
+            var stock_vInDollars = stock_v * cost_v;
+            var total = bank_v + stock_vInDollars;
+
+            output.innerHTML = slider.value;
             var cost_v = parseFloat(document.querySelector("#stockInfo").textContent.split('$')[1]);
             document.getElementById("stockInDollars").innerHTML = this.value;
             output.innerHTML = (this.value / cost_v).toFixed(2);
+            
             amountToBuySellText.value = this.value;
+
+            var bankProportion = (bank_v - this.value) / total;
+            var stockProportion = (total - bankProportion) / total;
+
+            //output.innerHTML = bankProportion * 100;
+
+            let canvas = document.getElementById('piechart');
+            let context = canvas.getContext('2d');
+
+            context.clearRect(0, 0, canvas.width, canvas.height);
+
+            if (buy.checked = true) {
+                var proportions = [
+                    { proportion: bankProportion * 100, format: { color: "#a5d6c3", label: 'Account Balance' } },
+                    { proportion: stockProportion, format: { color: "#a8c8ed", label: 'Stocks' } }];
+
+                var newPie = new DraggablePiechart({
+                    canvas: document.getElementById('piechart'),
+                    proportions: proportions,
+                    onchange: onPieChartChange
+                });
+            }
+            
         }</script>
 
     <!--Ajax Scripts-->
@@ -306,19 +364,36 @@
                     var bank_v = parseFloat(document.querySelector("#bankTotal").textContent.split('$')[1]);
                     document.getElementById("myRange").max = bank_v;
 
-                    var cost_v = parseFloat(document.querySelector("#stockInfo").textContent.split('$')[1])
-                    var stock_v = parseFloat(document.querySelector("#stockOwn").textContent);
 
-                    document.getElementById("stockNameEnd").textContent = document.getElementById("stockSymbol").value;
-                    var tot = bank_v + (cost_v * stock_v);
-                    document.getElementById("totalEnd").textContent = tot.toFixed(2);
+                    let canvas = document.getElementById('piechart');
+                    let context = canvas.getContext('2d');
+
+                    context.clearRect(0, 0, canvas.width, canvas.height);
+
+                    var bank_v = parseFloat(document.querySelector("#bankTotal").textContent.split('$')[1]);
+                    var stock_v = parseFloat(document.querySelector("#stockOwn").textContent);
+                    var cost_v = parseFloat(document.querySelector("#stockInfo").textContent.split('$')[1]);
+                    var stock_vInDollars = stock_v * cost_v;
+                    var total = bank_v + stock_v;
+
+                    var proportions = [
+                        { proportion: bank_v / total, format: { color: "#a5d6c3", label: 'Account Balance' } },
+                        { proportion: stock_vInDollars / total, format: { color: "#a8c8ed", label: 'Stocks' } }];
+
+                    var newPie = new DraggablePiechart({
+                        canvas: document.getElementById('piechart'),
+                        proportions: proportions,
+                        onchange: onPieChartChange
+                    });
 
                 }
             });
         }
 
+
+
         //function to handle accept button (buy/sell/hold)
-        $("#acceptButton").click(function () {
+        $("#acceptButton").click(function (piechart) {
 
             var buySellInput_v = parseFloat(document.querySelector("#buySellInput").value);
             var bank_v = parseFloat(document.querySelector("#bankTotal").textContent.split('$')[1]);
@@ -333,15 +408,9 @@
 
             if (document.getElementById('buyButton').checked) {
 
-                stock_v = (stock_v + (buySellInput_v /cost_v)).toFixed(2);
+                stock_v = (stock_v + (buySellInput_v / cost_v)).toFixed(2);
 
                 bank_v = bank_v - buySellInput_v;
-
-                buySellInput.value = 0;
-                document.querySelector("#myRange").value = 0;
-                document.querySelector("#demo").textContent = 0;
-                bank.textContent = '$' + bank_v.toFixed(2);
-                stock.textContent = stock_v.toString();
 
                 updatedApi();
             }
@@ -349,16 +418,10 @@
 
                 stock_v = (stock_v - (buySellInput_v / cost_v)).toFixed(2);
 
-                bank_v = (bank_v + buySellInput).toFixed(2);
-
-                buySellInput.value = 0;
-                document.querySelector("#myRange").value = 0;
-                document.querySelector("#demo").textContent = 0;
-                bank.textContent = '$' + bank_v.toFixed(2);
-                stock.textContent = stock_v.toString();
+                bank_v = bank_v + buySellInput_v;
 
                 updatedApi();
-                
+
             }
             else if (document.getElementById('holdButton').checked) {
 
@@ -369,27 +432,18 @@
                 document.getElementById("notOpt").style.visibility = "visible";
             }
 
+
+            buySellInput.value = 0;
+            document.querySelector("#myRange").value = 0;
+            document.querySelector("#demo").textContent = 0;
+            bank.textContent = '$' + bank_v.toFixed(2);
+            stock.textContent = stock_v.toString();
             document.getElementById("myRange").max = bank_v;
 
+        });</script>
 
-            let canvas = document.getElementById('piechart');
-            let context = canvas.getContext('2d');
 
-            context.clearRect(0, 0, canvas.width, canvas.height);
 
-            var total = bank_v + stock_v;
-
-            var proportions = [
-                { proportion: bank_v / total, format: { color: "#a5d6c3", label: 'Account Balance' } },
-                { proportion: stock_v / total, format: { color: "#a8c8ed", label: 'Stocks' } }];
-
-            var newPie = new DraggablePiechart({
-                canvas: document.getElementById('piechart'),
-                proportions: proportions,
-                onchange: onPieChartChange
-            });
-        });
-    </script>
     @*
         <!--Quit Button-->
         <script type="text/javascript">
